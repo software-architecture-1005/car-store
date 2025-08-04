@@ -1,42 +1,42 @@
 # 🚗 Car Store
 
-Aplicación fullstack para gestión de tienda de automóviles desarrollada con Django (backend) y React (frontend).
+Fullstack car dealership management application built with Django (backend) and React (frontend).
 
-## 📁 Estructura del Proyecto
+## 📁 Project Structure
 
 ```
 car-store/
-├── backend/              # API Django REST
-│   ├── backend/         # Configuración del proyecto
-│   ├── core/           # App principal
-│   ├── venv/           # Entorno virtual (no incluido en git)
+├── backend/              # Django REST API
+│   ├── backend/         # Project configuration
+│   ├── core/           # Main app
+│   ├── venv/           # Virtual environment (not included in git)
 │   ├── manage.py
-│   └── requirements.txt # Dependencias de Python
-├── frontend/            # Aplicación React
+│   └── requirements.txt # Python dependencies
+├── frontend/            # React application
 │   ├── src/
 │   ├── public/
-│   ├── package.json    # Dependencias de Node.js
+│   ├── package.json    # Node.js dependencies
 │   └── vite.config.js
 ├── .gitignore
 └── README.md
 ```
 
-## 🚀 Configuración del Entorno de Desarrollo
+## 🚀 Development Environment Setup
 
-### Prerrequisitos
+### Prerequisites
 
-- **Python 3.8+** ([Descargar aquí](https://www.python.org/downloads/))
-- **Node.js 16+** ([Descargar aquí](https://nodejs.org/))
-- **Git** ([Descargar aquí](https://git-scm.com/))
+- **Python 3.8+** ([Download here](https://www.python.org/downloads/))
+- **Node.js 16+** ([Download here](https://nodejs.org/))
+- **Git** ([Download here](https://git-scm.com/))
 
-### 🔄 Setup Rápido (Primera Vez)
+### 🔄 Quick Setup (First Time)
 
 ```bash
-# 1. Clonar el repositorio
-git clone <URL_DEL_REPOSITORIO>
+# 1. Clone the repository
+git clone <REPOSITORY_URL>
 cd car-store
 
-# 2. Configurar Backend
+# 2. Setup Backend
 cd backend
 python -m venv venv
 venv\Scripts\activate        # Windows
@@ -44,11 +44,11 @@ venv\Scripts\activate        # Windows
 pip install -r requirements.txt
 python manage.py migrate
 
-# 3. Configurar Frontend (nueva terminal)
+# 3. Setup Frontend (new terminal)
 cd frontend
 npm install
 
-# 4. Ejecutar ambos servidores
+# 4. Run both servers
 # Terminal 1 (Backend):
 cd backend
 venv\Scripts\activate
@@ -59,232 +59,232 @@ cd frontend
 npm run dev
 ```
 
-## 🐍 Configuración Detallada del Backend (Django)
+## 🐍 Detailed Backend Setup (Django)
 
-### 1. Crear y Activar Entorno Virtual
+### 1. Create and Activate Virtual Environment
 
 ```bash
-# ⚠️ IMPORTANTE: Navegar al directorio backend
+# ⚠️ IMPORTANT: Navigate to backend directory
 cd backend
 
-# Crear entorno virtual
+# Create virtual environment
 python -m venv venv
 
-# Activar entorno virtual
+# Activate virtual environment
 # Windows:
 venv\Scripts\activate
 # macOS/Linux:
 source venv/bin/activate
 ```
 
-**✅ Verificar activación:** Deberías ver `(venv)` al inicio de tu terminal.
+**✅ Verify activation:** You should see `(venv)` at the beginning of your terminal.
 
-### 2. Instalar Dependencias de Python
+### 2. Install Python Dependencies
 
 ```bash
-# ⚠️ ASEGÚRATE de que el entorno virtual esté activado
-# Actualizar pip
+# ⚠️ MAKE SURE the virtual environment is activated
+# Update pip
 python -m pip install --upgrade pip
 
-# Instalar todas las dependencias del proyecto
+# Install all project dependencies
 pip install -r requirements.txt
 ```
 
-**📋 Dependencias incluidas en `requirements.txt`:**
-- `Django==3.2.12` - Framework web
-- `djangorestframework==3.14.0` - API REST
-- `django-cors-headers==4.3.1` - Configuración CORS
+**📋 Dependencies included in `requirements.txt`:**
+- `Django==3.2.12` - Web framework
+- `djangorestframework==3.14.0` - REST API
+- `django-cors-headers==4.3.1` - CORS configuration
 
-### 3. Configurar Base de Datos
+### 3. Setup Database
 
 ```bash
-# Aplicar migraciones (crear tablas)
+# Apply migrations (create tables)
 python manage.py migrate
 ```
 
-### 4. Ejecutar Servidor Backend
+### 4. Run Backend Server
 
 ```bash
 python manage.py runserver
 ```
 
-**✅ Backend disponible en:** `http://localhost:8000`
-**✅ Panel Admin en:** `http://localhost:8000/admin`
+**✅ Backend available at:** `http://localhost:8000`
+**✅ Admin Panel at:** `http://localhost:8000/admin`
 
-## ⚛️ Configuración Detallada del Frontend (React)
+## ⚛️ Detailed Frontend Setup (React)
 
-### 1. Navegar al Directorio Frontend
+### 1. Navigate to Frontend Directory
 
 ```bash
-# ⚠️ IMPORTANTE: Desde la raíz del proyecto, navegar a frontend
+# ⚠️ IMPORTANT: From project root, navigate to frontend
 cd frontend
 ```
 
-### 2. Verificar Ubicación Correcta
+### 2. Verify Correct Location
 
 ```bash
-# Verificar que existe package.json en el directorio actual
+# Verify that package.json exists in current directory
 dir package.json  # Windows
 # ls package.json  # macOS/Linux
 ```
 
-**❌ Error común:** Ejecutar `npm install` desde `car-store/` en lugar de `car-store/frontend/`
+**❌ Common error:** Running `npm install` from `car-store/` instead of `car-store/frontend/`
 
-### 3. Instalar Dependencias de Node.js
+### 3. Install Node.js Dependencies
 
 ```bash
-# Instalar todas las dependencias
+# Install all dependencies
 npm install
 ```
 
-**📋 Dependencias incluidas automáticamente:**
-- `react` - Framework frontend
+**📋 Dependencies included automatically:**
+- `react` - Frontend framework
 - `react-dom` - DOM manipulation
-- `vite` - Build tool y dev server
+- `vite` - Build tool and dev server
 - `eslint` - Code linting
 
-### 4. Ejecutar Servidor Frontend
+### 4. Run Frontend Server
 
 ```bash
 npm run dev
 ```
 
-**✅ Frontend disponible en:** `http://localhost:5173`
+**✅ Frontend available at:** `http://localhost:5173`
 
-## 🔧 Comandos de Desarrollo Diario
+## 🔧 Daily Development Commands
 
 ### Backend (Django)
 
 ```bash
-# ⚠️ Siempre activar entorno virtual primero
+# ⚠️ Always activate virtual environment first
 cd backend
 venv\Scripts\activate  # Windows
 # source venv/bin/activate  # macOS/Linux
 
-# Comandos principales
-python manage.py runserver          # Ejecutar servidor
-python manage.py makemigrations     # Crear migraciones
-python manage.py migrate            # Aplicar migraciones
-python manage.py test               # Ejecutar tests
-python manage.py shell              # Shell de Django
-python manage.py collectstatic      # Recopilar archivos estáticos
+# Main commands
+python manage.py runserver          # Run server
+python manage.py makemigrations     # Create migrations
+python manage.py migrate            # Apply migrations
+python manage.py test               # Run tests
+python manage.py shell              # Django shell
+python manage.py collectstatic      # Collect static files
 ```
 
 ### Frontend (React)
 
 ```bash
-# ⚠️ Asegúrate de estar en el directorio frontend
+# ⚠️ Make sure you're in the frontend directory
 cd frontend
 
-# Comandos principales
-npm run dev          # Servidor de desarrollo
-npm run build        # Build para producción
-npm run preview      # Preview del build
-npm run lint         # Ejecutar linting
+# Main commands
+npm run dev          # Development server
+npm run build        # Production build
+npm run preview      # Preview build
+npm run lint         # Run linting
 ```
 
-## 📦 Gestión de Dependencias
+## 📦 Dependency Management
 
-### Agregar Nuevas Dependencias al Backend
+### Adding New Backend Dependencies
 
 ```bash
-# Con entorno virtual activado
+# With virtual environment activated
 cd backend
 venv\Scripts\activate
 
-# Instalar nueva dependencia
-pip install <nombre-del-paquete>
+# Install new dependency
+pip install <package-name>
 
-# Actualizar requirements.txt
+# Update requirements.txt
 pip freeze > requirements.txt
 ```
 
-### Agregar Nuevas Dependencias al Frontend
+### Adding New Frontend Dependencies
 
 ```bash
 cd frontend
 
-# Dependencia de producción
-npm install <nombre-del-paquete>
+# Production dependency
+npm install <package-name>
 
-# Dependencia de desarrollo
-npm install -D <nombre-del-paquete>
+# Development dependency
+npm install -D <package-name>
 ```
 
-## 🚨 Solución de Problemas Comunes
+## 🚨 Common Issues Troubleshooting
 
-### ❌ Error: "python no se reconoce como comando"
+### ❌ Error: "python is not recognized as a command"
 ```bash
-# Soluciones:
-python3 -m venv venv        # Usar python3
-py -m venv venv            # Usar py launcher (Windows)
+# Solutions:
+python3 -m venv venv        # Use python3
+py -m venv venv            # Use py launcher (Windows)
 ```
 
 ### ❌ Error: "No module named 'django'"
 ```bash
-# Verificar que el entorno virtual esté activado
-# Deberías ver (venv) en tu terminal
+# Verify that virtual environment is activated
+# You should see (venv) in your terminal
 venv\Scripts\activate
 
-# Reinstalar dependencias
+# Reinstall dependencies
 pip install -r requirements.txt
 ```
 
 ### ❌ Error: "Could not read package.json"
 ```bash
-# Verificar que estás en el directorio correcto
-cd frontend              # Navegar al directorio frontend
-dir package.json        # Verificar que existe el archivo
-npm install             # Ahora debería funcionar
+# Verify you're in the correct directory
+cd frontend              # Navigate to frontend directory
+dir package.json        # Verify file exists
+npm install             # Should work now
 ```
 
-## 🤝 Contribuir al Proyecto
+## 🤝 Contributing to the Project
 
-1. **Crear rama:** `git checkout -b feature/nueva-funcionalidad`
-2. **Hacer cambios y commit:** `git commit -m "Descripción del cambio"`
-3. **Push:** `git push origin feature/nueva-funcionalidad`
-4. **Crear Pull Request**
+1. **Create branch:** `git checkout -b feature/new-feature`
+2. **Make changes and commit:** `git commit -m "Description of change"`
+3. **Push:** `git push origin feature/new-feature`
+4. **Create Pull Request**
 
-### Antes de hacer commit:
+### Before committing:
 ```bash
-# Backend - ejecutar tests
+# Backend - run tests
 cd backend
 venv\Scripts\activate
 python manage.py test
 
-# Frontend - verificar linting
+# Frontend - verify linting
 cd frontend
 npm run lint
 ```
 
-## 📚 Tecnologías del Stack
+## 📚 Technology Stack
 
 ### Backend
-- **Django 3.2.12** - Framework web de Python
-- **Django REST Framework 3.14.0** - Creación de APIs REST
-- **django-cors-headers 4.3.1** - Manejo de CORS
-- **SQLite** - Base de datos (desarrollo)
+- **Django 3.2.12** - Python web framework
+- **Django REST Framework 3.14.0** - REST API creation
+- **django-cors-headers 4.3.1** - CORS handling
+- **SQLite** - Database (development)
 
 ### Frontend
-- **React 19.1.0** - Framework de JavaScript
-- **Vite 7.0.4** - Build tool y servidor de desarrollo
-- **ESLint** - Linting de código
+- **React 19.1.0** - JavaScript framework
+- **Vite 7.0.4** - Build tool and development server
+- **ESLint** - Code linting
 
-## ⚡ Comandos Rápidos de Referencia
+## ⚡ Quick Reference Commands
 
 ```bash
-# Activar entorno virtual (Backend)
+# Activate virtual environment (Backend)
 cd backend && venv\Scripts\activate
 
-# Ejecutar servidor Django
+# Run Django server
 python manage.py runserver
 
-# Ejecutar servidor React (nueva terminal)
+# Run React server (new terminal)
 cd frontend && npm run dev
 
-# Instalar nueva dependencia Python
-pip install <paquete> && pip freeze > requirements.txt
+# Install new Python dependency
+pip install <package> && pip freeze > requirements.txt
 
-# Instalar nueva dependencia Node.js
-npm install <paquete>
+# Install new Node.js dependency
+npm install <package>
 ```
