@@ -29,7 +29,6 @@ class VehicleSearch:
             self.queryset = self.queryset.filter(category__name__iexact=category_name)
 
     def _filter_by_year(self):
-        """Filtra por un rango de años."""
         year_min = self.filters.get('year_min')
         year_max = self.filters.get('year_max')
         
@@ -42,7 +41,6 @@ class VehicleSearch:
             self.queryset = self.queryset.filter(year__lte=year_max)
 
     def _filter_by_price(self):
-        """Filtra por un rango de precios."""
         price_min = self.filters.get('price_min')
         price_max = self.filters.get('price_max')
         
