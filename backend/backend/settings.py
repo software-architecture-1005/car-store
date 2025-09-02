@@ -84,7 +84,7 @@ DATABASES = {
     }
 }
 
-
+AUTH_USER_MODEL = 'core.User'  # Indica a Django que use nuestro modelo User personalizado
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
 
