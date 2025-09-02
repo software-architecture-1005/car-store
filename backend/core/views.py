@@ -1,4 +1,6 @@
 from django.shortcuts import render
+from rest_framework.decorators import action
+from rest_framework.response import Response
 from rest_framework import viewsets
 # Esto de abajo es para importar los datos serializados y mostrarlos en la vista
 from .serializer import (
@@ -31,3 +33,37 @@ class BuyerViewSet(viewsets.ModelViewSet):
 class ExpertViewSet(viewsets.ModelViewSet):
     queryset = Expert.objects.all()
     serializer_class = ExpertSerializer
+
+class VehicleViewSet(viewsets.ModelViewSet):
+    queryset = Vehicle.objects.all()
+    serializer_class = VehicleSerializer
+    
+    # Acción básica: filtrar por marca (sin servicio)
+    @action(detail=False, methods=['get'])
+    def by_make(self, request):
+        make_id = request.query_params.get('make_id')
+        if make_id:
+            vehicles = Vehicle.objects.filter(make_id=make_id)
+            serializer = self.get_serializer(vehicles, many=True)
+            return Response(serializer.data)
+        return Response([])
+    
+    # Acción básica: filtrar por categoría (sin servicio)
+    @action(detail=False, methods=['get'])
+    def by_category(self, request):
+        category_id = request.query_params.get('category_id')
+        if category_id:
+            vehicles = Vehicle.objects.filter(category_id=category_id)
+            serializer = self.get_serializer(vehicles, many=True)
+            return Response(serializer.data)
+        return Response([])
+    
+    # Acción avanzada: búsqueda compleja (USANDO TU SERVICIO)
+    @action(detail=False, methods=['get'])
+    def search(self, request):
+        # Aquí es donde usamos tu VehicleSearch service
+        search_service = VehicleSearch(request.GET)
+        vehicles = search_service.execute()
+        
+        serializer = self.get_serializer(vehicles, many=True)
+        return Response(serializer.data)

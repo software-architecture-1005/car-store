@@ -49,3 +49,4 @@ class VehicleSearch:
             
         if price_max:
             self.queryset = self.queryset.filter(price__lte=price_max)
+        

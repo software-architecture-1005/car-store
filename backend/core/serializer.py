@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from .models import Make, Category, Vehicle, User, Role, Buyer, Expert, Review
 
-
+# Serializamos todos los datos para convertirlos en json para pasarlos por la Api
 class MakeSerializer(serializers.ModelSerializer):
         class Meta:
                 model = Make
