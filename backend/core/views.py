@@ -2,6 +2,7 @@ from django.shortcuts import render
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import viewsets
+from .services import VehicleSearch
 # Esto de abajo es para importar los datos serializados y mostrarlos en la vista
 from .serializer import (
     MakeSerializer, CategorySerializer, VehicleSerializer, 
@@ -33,6 +34,10 @@ class BuyerViewSet(viewsets.ModelViewSet):
 class ExpertViewSet(viewsets.ModelViewSet):
     queryset = Expert.objects.all()
     serializer_class = ExpertSerializer
+    
+class ReviewViewSet(viewsets.ModelViewSet):
+    queryset = Review.objects.all()
+    serializer_class = ReviewSerializer
 
 class VehicleViewSet(viewsets.ModelViewSet):
     queryset = Vehicle.objects.all()
@@ -67,3 +72,27 @@ class VehicleViewSet(viewsets.ModelViewSet):
         
         serializer = self.get_serializer(vehicles, many=True)
         return Response(serializer.data)
+    
+class ReviewViewSet(viewsets.ModelViewSet):
+    queryset = Review.objects.all()
+    serializer_class = ReviewSerializer
+    
+    # Acción básica: reseñas por vehículo
+    @action(detail=False, methods=['get'])
+    def by_vehicle(self, request):
+        vehicle_id = request.query_params.get('vehicle_id')
+        if vehicle_id:
+            reviews = Review.objects.filter(vehicle_id=vehicle_id)
+            serializer = self.get_serializer(reviews, many=True)
+            return Response(serializer.data)
+        return Response([])
+    
+    # Acción básica: reseñas por experto
+    @action(detail=False, methods=['get'])
+    def by_expert(self, request):
+        expert_id = request.query_params.get('expert_id')
+        if expert_id:
+            reviews = Review.objects.filter(author_id=expert_id)
+            serializer = self.get_serializer(reviews, many=True)
+            return Response(serializer.data)
+        return Response([])
