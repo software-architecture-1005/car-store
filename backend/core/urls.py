@@ -1,10 +1,16 @@
 from django.urls import path, include
 from rest_framework import routers
-from cars import views
-
+from . import views
 
 router = routers.DefaultRouter()
-router.register(r'cars', views.CarView, 'cars')
+router.register(r'makes', views.MakeViewSet, 'makes')
+router.register(r'categories', views.CategoryViewSet, 'categories')
+router.register(r'vehicles', views.VehicleViewSet, 'vehicles')
+router.register(r'users', views.UserViewSet, 'users')
+router.register(r'roles', views.RoleViewSet, 'roles')
+router.register(r'buyers', views.BuyerViewSet, 'buyers')
+router.register(r'experts', views.ExpertViewSet, 'experts')
+router.register(r'reviews', views.ReviewViewSet, 'reviews')
 
 urlpatterns = [
     # Versionado de la api
