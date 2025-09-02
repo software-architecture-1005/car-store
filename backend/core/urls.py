@@ -1,6 +1,7 @@
 from django.urls import path, include
 from rest_framework import routers
 from . import views
+from rest_framework.documentation import include_docs_urls
 
 router = routers.DefaultRouter()
 router.register(r'makes', views.MakeViewSet, 'makes')
@@ -14,5 +15,5 @@ router.register(r'reviews', views.ReviewViewSet, 'reviews')
 
 urlpatterns = [
     # Versionado de la api
-    path("api/v1/", include(router.urls))
+    path("api/v1/", include(router.urls)),
 ]
