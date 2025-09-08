@@ -4,6 +4,10 @@
   color: var(--text-primary);
 }
 
+.registrar {
+  padding-top: 110px;
+}
+
 /* Smooth scrolling */
 html {
   scroll-behavior: smooth;

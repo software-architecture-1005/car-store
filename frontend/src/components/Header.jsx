@@ -29,12 +29,14 @@ const Header = ({ currentPage, onNavigate }) => {
           >
             Inicio
           </button>
+
           <button 
             className={`nav-link ${currentPage === 'search' ? 'active' : ''}`}
             onClick={() => handleNavigation('search')}
           >
             Vehículos
           </button>
+
           <button 
             className={`nav-link ${currentPage === 'comparison' ? 'active' : ''}`}
             onClick={() => handleNavigation('comparison')}
@@ -47,6 +49,10 @@ const Header = ({ currentPage, onNavigate }) => {
           >
             Características
           </button>
+
+          <button className={`nav-link ${currentPage === 'registrar' ? 'active' : ''}`} onClick={() => handleNavigation('registrar')}>Registrar</button>
+
+          <button className={`nav-link ${currentPage === 'listar' ? 'active' : ''}`} onClick={() => handleNavigation('listar')}>Listar</button>
         </nav>
 
       </div>

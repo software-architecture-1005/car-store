@@ -2,6 +2,10 @@ import React, { useState } from 'react';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import Differentiator from './components/Differentiator';
+// vbenitezz
+import VehicleForm from './components/VehicleForm';
+import VehicleList from './components/VehicleList';
+// vbenitezz
 import SearchResults from './pages/SearchResults';
 import VehicleDetails from './pages/VehicleDetails';
 import VehicleComparison from './pages/VehicleComparison';
@@ -11,6 +15,7 @@ import './App.css';
 function App() {
   const [currentPage, setCurrentPage] = useState('home');
   const [selectedVehicle, setSelectedVehicle] = useState(null);
+  const [refresh, setRefresh] = useState(false);
 
   const handleSearch = (searchData) => {
     console.log('Searching for:', searchData);
@@ -42,6 +47,19 @@ function App() {
         return <VehicleComparison onBack={handleBackToHome} />;
       case 'features':
         return <Features />;
+      case 'registrar':
+        return (
+          <div className="registrar">
+              <VehicleForm vehicleCreated={() => setRefresh(!refresh)} />
+              {/* <VehicleList refresh={refresh} /> */}
+          </div>
+        );
+      case 'listar':
+        return (
+          <div className="listar">
+            <VehicleList />
+          </div>
+        );
       case 'home':
       default:
         return (

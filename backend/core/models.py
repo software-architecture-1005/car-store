@@ -29,6 +29,8 @@ class Vehicle(models.Model):
     make = models.ForeignKey(Make, on_delete=models.PROTECT, related_name='vehicles')
     category = models.ForeignKey(Category, on_delete=models.PROTECT, related_name='vehicles')
 
+    image = models.ImageField(upload_to='vehicles/', null=True, blank=True)
+
     def __str__(self):
         return f"{self.make} {self.model} ({self.year})"
 
