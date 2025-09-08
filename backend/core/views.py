@@ -34,10 +34,6 @@ class BuyerViewSet(viewsets.ModelViewSet):
 class ExpertViewSet(viewsets.ModelViewSet):
     queryset = Expert.objects.all()
     serializer_class = ExpertSerializer
-    
-class ReviewViewSet(viewsets.ModelViewSet):
-    queryset = Review.objects.all()
-    serializer_class = ReviewSerializer
 
 class VehicleViewSet(viewsets.ModelViewSet):
     queryset = Vehicle.objects.all()
@@ -96,3 +92,6 @@ class ReviewViewSet(viewsets.ModelViewSet):
             serializer = self.get_serializer(reviews, many=True)
             return Response(serializer.data)
         return Response([])
+from rest_framework import viewsets
+from .models import Vehicle
+from .serializers import VehicleSerializer
