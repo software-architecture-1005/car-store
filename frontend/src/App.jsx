@@ -1,35 +1,67 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React, { useState } from 'react';
+import Header from './components/Header';
+import Hero from './components/Hero';
+import Differentiator from './components/Differentiator';
+import SearchResults from './pages/SearchResults';
+import VehicleDetails from './pages/VehicleDetails';
+import VehicleComparison from './pages/VehicleComparison';
+import Features from './pages/Features';
+import './App.css';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [currentPage, setCurrentPage] = useState('home');
+  const [selectedVehicle, setSelectedVehicle] = useState(null);
+
+  const handleSearch = (searchData) => {
+    console.log('Searching for:', searchData);
+    setCurrentPage('search');
+  };
+
+  const handleViewDetails = (vehicleId) => {
+    setSelectedVehicle(vehicleId);
+    setCurrentPage('details');
+  };
+
+  const handleBackToSearch = () => {
+    setCurrentPage('search');
+    setSelectedVehicle(null);
+  };
+
+  const handleBackToHome = () => {
+    setCurrentPage('home');
+    setSelectedVehicle(null);
+  };
+
+  const renderPage = () => {
+    switch (currentPage) {
+      case 'search':
+        return <SearchResults onViewDetails={handleViewDetails} />;
+      case 'details':
+        return <VehicleDetails vehicleId={selectedVehicle} onBack={handleBackToSearch} />;
+      case 'comparison':
+        return <VehicleComparison onBack={handleBackToHome} />;
+      case 'features':
+        return <Features />;
+      case 'home':
+      default:
+        return (
+          <>
+            <Hero onSearch={handleSearch} />
+            <Differentiator />
+          </>
+        );
+    }
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div className="App">
+      <Header 
+        currentPage={currentPage}
+        onNavigate={setCurrentPage}
+      />
+      {renderPage()}
+    </div>
+  );
 }
 
-export default App
+export default App;
