@@ -72,6 +72,35 @@ class Vehicle(models.Model):
         # Opcional: define un orden por defecto para los vehículos
         ordering = ['-year', 'make']
 
+class VehicleSpecification(models.Model):
+    # La clave: conectamos cada hoja de especificaciones a un único vehículo.
+    # Si se borra el vehículo, se borran sus especificaciones.
+    vehicle = models.OneToOneField(
+        Vehicle, 
+        on_delete=models.CASCADE, 
+        primary_key=True,
+        related_name='specifications'
+    )
+
+    # --- Motor y Rendimiento ---
+    engine_type = models.CharField(max_length=100, blank=True, help_text="Ej: V6, Eléctrico, Híbrido")
+    transmission = models.CharField(max_length=100, blank=True, help_text="Ej: Automática, Manual")
+    power_hp = models.PositiveIntegerField(blank=True, null=True, help_text="Potencia en caballos de fuerza (HP)")
+    torque_nm = models.PositiveIntegerField(blank=True, null=True, help_text="Torque en Newton-metro (Nm)")
+    
+    # --- Dimensiones y Peso ---
+    length_mm = models.PositiveIntegerField(blank=True, null=True, help_text="Longitud en milímetros")
+    width_mm = models.PositiveIntegerField(blank=True, null=True, help_text="Ancho en milímetros")
+    height_mm = models.PositiveIntegerField(blank=True, null=True, help_text="Altura en milímetros")
+    curb_weight_kg = models.PositiveIntegerField(blank=True, null=True, help_text="Peso en kilogramos")
+    
+    # --- Consumo y Emisiones ---
+    fuel_consumption_city = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True, help_text="Consumo en ciudad (L/100km)")
+    fuel_consumption_highway = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True, help_text="Consumo en carretera (L/100km)")
+
+    def __str__(self):
+        return f"Specifications for {self.vehicle}"
+
 class Review(models.Model):
     vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE, related_name='reviews')
     
