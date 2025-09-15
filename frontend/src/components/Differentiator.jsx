@@ -38,7 +38,7 @@ const Differentiator = () => {
 
         <div className="steps-container">
           {steps.map((step, index) => (
-            <div key={index} className={`step hover-lift ${index === 1 ? 'step-active' : ''}`}>
+            <div key={index} className="step hover-lift">
               <div className="step-number">{step.number}</div>
               <div className="step-content">
                 <div className="step-icon">{step.icon}</div>

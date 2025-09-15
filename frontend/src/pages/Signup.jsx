@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import './Auth.css';
-import { signup } from '../services/authService';
+import { signup, login } from '../services/authService';
+import { useAuth } from '../contexts/AuthContext';
 
 const Signup = ({ onNavigate }) => {
   const [name, setName] = useState('');
@@ -9,6 +10,7 @@ const Signup = ({ onNavigate }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const { login: setAuth } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -16,16 +18,29 @@ const Signup = ({ onNavigate }) => {
     setError('');
     
     try {
-      await signup({ username: name, email, password });
+      const username = (email || '').trim().toLowerCase();
+      await signup({ username, email, password });
+      // Auto login para habilitar inmediatamente el carrito
+      const loginResponse = await login({ username, password });
+      console.log('Login response:', loginResponse);
+      console.log('Auto-login tokens saved:', !!localStorage.getItem('accessToken'));
+      setAuth({ email });
       setSuccess(true);
-      // Redirigir al login después del registro exitoso
       setTimeout(() => {
         if (onNavigate) {
-          onNavigate('login');
+          onNavigate('home');
         }
-      }, 2000);
+      }, 1000);
     } catch (err) {
-      setError('Error al crear la cuenta. Intenta nuevamente.');
+      const apiErr = err?.response?.data;
+      if (apiErr) {
+        // Mostrar errores específicos del backend si existen
+        const firstKey = Object.keys(apiErr)[0];
+        const msg = Array.isArray(apiErr[firstKey]) ? apiErr[firstKey][0] : (apiErr.detail || 'Error al crear la cuenta.');
+        setError(String(msg));
+      } else {
+        setError('Error al crear la cuenta. Intenta nuevamente.');
+      }
     } finally {
       setLoading(false);
     }

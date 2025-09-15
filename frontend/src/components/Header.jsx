@@ -1,8 +1,11 @@
 import React from 'react';
 import './Header.css';
 import logoImage from '../assets/Logo-automatch-sin-fondo.png';
+import { useAuth } from '../contexts/AuthContext';
 
-const Header = ({ currentPage, onNavigate, isAuthenticated, user }) => {
+const Header = ({ currentPage, onNavigate }) => {
+  const { isAuthenticated, user, logout } = useAuth();
+  
   const handleNavigation = (page) => {
     if (onNavigate) {
       onNavigate(page);
@@ -72,10 +75,8 @@ const Header = ({ currentPage, onNavigate, isAuthenticated, user }) => {
               <button 
                 className="nav-link" 
                 onClick={() => {
-                  // Aquí implementarías la función de logout
-                  localStorage.removeItem('accessToken');
-                  localStorage.removeItem('refreshToken');
-                  window.location.reload();
+                  logout();
+                  handleNavigation('home');
                 }}
               >
                 Cerrar Sesión

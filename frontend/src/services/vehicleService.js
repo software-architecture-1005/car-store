@@ -40,6 +40,7 @@ export const searchVehicles = (searchParams = {}) => {
     });
     
     console.log('URL params:', params.toString());
+    console.log('Search params sent to backend:', searchParams);
     return api.get(`/vehicles/search/?${params.toString()}`).then((res) => res.data);
 };
 

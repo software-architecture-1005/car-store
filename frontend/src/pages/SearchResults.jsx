@@ -6,8 +6,9 @@ import { getMakes } from '../services/makeService';
 import { getCategories } from '../services/categoryService';
 import './SearchResults.css';
 
-const SearchResults = ({ onViewDetails }) => {
+const SearchResults = ({ onViewDetails, initialFilters }) => {
   console.log('SearchResults renderizado');
+  console.log('Initial filters received:', initialFilters);
   
   const [filters, setFilters] = useState({
     search: '',
@@ -27,6 +28,56 @@ const SearchResults = ({ onViewDetails }) => {
   const [loading, setLoading] = useState(true);
   const [makes, setMakes] = useState([]);
   const [categories, setCategories] = useState([]);
+
+  // Aplicar filtros iniciales del hero
+  useEffect(() => {
+    if (initialFilters) {
+      console.log('Applying initial filters:', initialFilters);
+      const newFilters = { ...filters };
+      
+      // Mapear brand del hero a brands array
+      if (initialFilters.brand) {
+        console.log('Hero brand received:', initialFilters.brand);
+        newFilters.brands = [initialFilters.brand];
+        console.log('Brands array set to:', newFilters.brands);
+      }
+      
+      // Mapear model del hero a search
+      if (initialFilters.model) {
+        newFilters.search = initialFilters.model;
+      }
+      
+      // Mapear budget del hero a priceMin y priceMax
+      if (initialFilters.budget) {
+        console.log('Hero budget received:', initialFilters.budget);
+        const [min, max] = initialFilters.budget.split('-');
+        console.log('Split budget - min:', min, 'max:', max);
+        
+        if (min) {
+          newFilters.priceMin = parseFloat(min);
+          console.log('Price min set from hero:', newFilters.priceMin);
+        }
+        if (max) {
+          if (max === '+') {
+            // Para rangos con "+", solo establecer priceMin
+            newFilters.priceMin = parseFloat(min);
+            console.log('Price min set for + range:', newFilters.priceMin);
+          } else {
+            newFilters.priceMax = parseFloat(max);
+            console.log('Price max set from hero:', newFilters.priceMax);
+          }
+        }
+      }
+      
+      console.log('New filters after mapping:', newFilters);
+      setFilters(newFilters);
+      
+      // Marcar que hay filtros activos para ejecutar búsqueda automáticamente
+      setTimeout(() => {
+        performSearch(newFilters);
+      }, 100);
+    }
+  }, [initialFilters]);
 
   // Cargar datos iniciales del backend
   useEffect(() => {
@@ -115,47 +166,54 @@ const SearchResults = ({ onViewDetails }) => {
   };
 
   // Función para realizar búsqueda manual
-  const performSearch = async () => {
+  const performSearch = async (customFilters = null) => {
+    console.log('=== PERFORM SEARCH CALLED ===');
+    console.log('Custom filters:', customFilters);
+    console.log('Current filters:', filters);
     try {
       setLoading(true);
+      
+      const filtersToUse = customFilters || filters;
       
       // Preparar parámetros para la búsqueda del backend
       const searchParams = {};
       
-      if (filters.search) {
-        searchParams.search = filters.search;
+      if (filtersToUse.search) {
+        searchParams.search = filtersToUse.search;
       }
       
-      if (filters.priceMin) {
-        searchParams.price_min = parseFloat(filters.priceMin);
+      if (filtersToUse.priceMin) {
+        searchParams.price_min = parseFloat(filtersToUse.priceMin);
+        console.log('Price min set to:', searchParams.price_min);
       }
       
-      if (filters.priceMax) {
-        searchParams.price_max = parseFloat(filters.priceMax);
+      if (filtersToUse.priceMax) {
+        searchParams.price_max = parseFloat(filtersToUse.priceMax);
+        console.log('Price max set to:', searchParams.price_max);
       }
       
-      if (filters.yearFrom) {
-        searchParams.year_from = parseInt(filters.yearFrom);
+      if (filtersToUse.yearFrom) {
+        searchParams.year_from = parseInt(filtersToUse.yearFrom);
       }
       
-      if (filters.yearTo) {
-        searchParams.year_to = parseInt(filters.yearTo);
+      if (filtersToUse.yearTo) {
+        searchParams.year_to = parseInt(filtersToUse.yearTo);
       }
       
-      if (filters.brands && filters.brands.length > 0) {
-        searchParams.brands = filters.brands;
+      if (filtersToUse.brands && filtersToUse.brands.length > 0) {
+        searchParams.brands = filtersToUse.brands;
       }
       
-      if (filters.color) {
-        searchParams.color = filters.color;
+      if (filtersToUse.color) {
+        searchParams.color = filtersToUse.color;
       }
       
-      if (filters.category) {
-        searchParams.category_id = filters.category;
+      if (filtersToUse.category) {
+        searchParams.category_id = filtersToUse.category;
       }
       
       console.log('Parámetros de búsqueda enviados:', searchParams);
-      console.log('Filtros activos:', filters);
+      console.log('Filtros activos:', filtersToUse);
       
       // Verificar si hay algún filtro activo
       const hasActiveFilters = Object.keys(searchParams).length > 0;

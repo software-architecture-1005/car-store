@@ -17,9 +17,12 @@ import './App.css';
 function AppContent() {
   const [currentPage, setCurrentPage] = useState('home');
   const [selectedVehicle, setSelectedVehicle] = useState(null);
+  const [searchFilters, setSearchFilters] = useState(null);
   const { isAuthenticated, user } = useAuth();
 
-  const handleSearch = () => {
+  const handleSearch = (searchData) => {
+    console.log('Hero search data received:', searchData);
+    setSearchFilters(searchData);
     setCurrentPage('search');
   };
 
@@ -43,7 +46,7 @@ function AppContent() {
       case 'cart':
         return <CartPage onViewDetails={handleViewDetails} />;
       case 'search':
-        return <SearchResults onViewDetails={handleViewDetails} />;
+        return <SearchResults onViewDetails={handleViewDetails} initialFilters={searchFilters} />;
       case 'details':
         return <VehicleDetails vehicleId={selectedVehicle} onBack={handleBackToSearch} />;
       case 'comparison':
@@ -72,8 +75,6 @@ function AppContent() {
       <Header
         currentPage={currentPage}
         onNavigate={setCurrentPage}
-        isAuthenticated={isAuthenticated}
-        user={user}
       />
       {renderPage()}
     </div>

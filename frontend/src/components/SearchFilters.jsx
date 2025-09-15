@@ -176,7 +176,14 @@ const SearchFilters = ({ onFilterChange, filters, makes = [], categories = [], o
         <div className="search-button-container">
           <button 
             className="search-button"
-            onClick={onSearch}
+            onClick={() => {
+              console.log('Search button clicked in SearchFilters');
+              if (onSearch) {
+                onSearch();
+              } else {
+                console.error('onSearch function not provided');
+              }
+            }}
           >
             🔍 Buscar Vehículos
           </button>

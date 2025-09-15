@@ -4,12 +4,15 @@ import axiosGlobalInstance from '../api/axiosGlobalInstance';
 import './CartPage.css';
 
 const CartPage = ({ onViewDetails }) => {
+  console.log('CartPage component rendering');
   const { isAuthenticated, user } = useAuth();
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
   useEffect(() => {
+    console.log('CartPage useEffect - isAuthenticated:', isAuthenticated);
+    console.log('CartPage useEffect - user:', user);
     if (isAuthenticated) {
       fetchCartItems();
     } else {
@@ -20,14 +23,22 @@ const CartPage = ({ onViewDetails }) => {
   const fetchCartItems = async () => {
     try {
       setLoading(true);
+      console.log('=== FETCHING CART ITEMS ===');
       const response = await axiosGlobalInstance.get('/cart/');
+      console.log('Cart response:', response.data);
+      
       if (response.data && response.data.length > 0) {
         const cart = response.data[0];
+        console.log('Cart object:', cart);
+        console.log('Cart items:', cart.items);
         setCartItems(cart.items || []);
+      } else {
+        console.log('No cart data found');
+        setCartItems([]);
       }
     } catch (err) {
-      setError('No se pudo cargar el carrito. Por favor, inicia sesión.');
       console.error('Error fetching cart:', err);
+      setError('No se pudo cargar el carrito. Por favor, inicia sesión.');
     } finally {
       setLoading(false);
     }
@@ -35,8 +46,16 @@ const CartPage = ({ onViewDetails }) => {
 
   const removeFromCart = async (itemId) => {
     try {
-      await axiosGlobalInstance.delete(`/cart-items/${itemId}/`);
-      setCartItems(cartItems.filter(item => item.id !== itemId));
+      console.log('Removing item from cart:', itemId);
+      // Primero obtener el cart_id
+      const cartResponse = await axiosGlobalInstance.get('/cart/');
+      if (cartResponse.data && cartResponse.data.length > 0) {
+        const cartId = cartResponse.data[0].id;
+        // Usar el endpoint correcto para remover item
+        await axiosGlobalInstance.post(`/cart/${cartId}/remove_item/`, { item_id: itemId });
+        // Actualizar la lista local
+        setCartItems(cartItems.filter(item => item.id !== itemId));
+      }
     } catch (err) {
       console.error('Error removing item:', err);
     }
@@ -101,7 +120,7 @@ const CartPage = ({ onViewDetails }) => {
                 <div className="item-actions">
                   <button 
                     className="btn-secondary"
-                    onClick={() => onViewDetails && onViewDetails(item.vehicle)}
+                    onClick={() => onViewDetails && onViewDetails(item.vehicle.id)}
                   >
                     Ver Detalles
                   </button>

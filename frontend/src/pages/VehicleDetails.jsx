@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import './VehicleDetails.css';
 import { getVehicle } from '../services/vehicleService';
+import { addVehicleToCart } from '../services/cartService';
 
 const VehicleDetails = ({ vehicleId, onBack }) => {
+  console.log('VehicleDetails component rendering with vehicleId:', vehicleId);
   const [activeTab, setActiveTab] = useState('overview');
   const [vehicle, setVehicle] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -10,6 +12,7 @@ const VehicleDetails = ({ vehicleId, onBack }) => {
 
   useEffect(() => {
     const loadVehicle = async () => {
+      console.log('VehicleDetails - Loading vehicle with ID:', vehicleId);
       if (!vehicleId) {
         setError('ID de vehículo no proporcionado');
         setLoading(false);
@@ -18,7 +21,9 @@ const VehicleDetails = ({ vehicleId, onBack }) => {
 
       try {
         setLoading(true);
+        console.log('VehicleDetails - Fetching vehicle data...');
         const vehicleData = await getVehicle(vehicleId);
+        console.log('VehicleDetails - Vehicle data received:', vehicleData);
         
         // Transformar datos del backend al formato esperado
         const transformedVehicle = {
@@ -245,11 +250,21 @@ const VehicleDetails = ({ vehicleId, onBack }) => {
             </div>
 
             <div className="action-buttons">
-              <button className="btn-primary cta-button">
+              <button className="btn-primary cta-button" onClick={async () => {
+                try {
+                  console.log('Attempting to add vehicle to cart from details:', vehicle.id);
+                  await addVehicleToCart(vehicle.id);
+                  alert('Vehículo agregado al carrito');
+                } catch (e) {
+                  console.error('Error adding to cart from details:', e);
+                  const errorMessage = e.response?.data?.error || e.message || 'Error desconocido';
+                  alert(`No se pudo agregar al carrito: ${errorMessage}`);
+                }
+              }}>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M9 3H7c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h2c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 14H7V5h2v12zm8-14h-2c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h2c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 14h-2V5h2v12z"/>
+                  <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zm10 0c-1.1 0-1.99.9-1.99 2S15.9 22 17 22s2-.9 2-2-.9-2-2-2zM7.82 12.94l.03.05c.22.23.53.36.85.36h7.46c.54 0 1.02-.33 1.21-.84l2.54-6.79A1 1 0 0019 4H6.21l-.94-2H2v2h2l3.6 7.59-1.35 2.44C5.52 14.36 6.48 16 8 16h10v-2H8l1.82-3.06z"/>
                 </svg>
-                Añadir a Comparador
+                Agregar al carrito
               </button>
               <button className="btn-secondary">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">

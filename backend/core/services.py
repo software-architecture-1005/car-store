@@ -101,11 +101,18 @@ class VehicleSearch:
         price_min = self.filters.get('price_min')
         price_max = self.filters.get('price_max')
         
+        print(f"Filtro por precio - price_min: {price_min}, price_max: {price_max}")
+        print(f"Tipos - price_min: {type(price_min)}, price_max: {type(price_max)}")
+        
         if price_min:
+            print(f"Aplicando filtro price__gte={price_min}")
             self.queryset = self.queryset.filter(price__gte=price_min)
+            print(f"QuerySet después de price_min: {self.queryset.count()}")
             
         if price_max:
+            print(f"Aplicando filtro price__lte={price_max}")
             self.queryset = self.queryset.filter(price__lte=price_max)
+            print(f"QuerySet después de price_max: {self.queryset.count()}")
 
     def _filter_by_color(self):
         """Filtro por color"""

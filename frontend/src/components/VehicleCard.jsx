@@ -1,6 +1,7 @@
 import React from 'react';
 import './VehicleCard.css';
 import { useComparison } from '../contexts/ComparisonContext';
+import { addVehicleToCart } from '../services/cartService';
 
 const VehicleCard = ({ vehicle, onViewDetails, onCompare }) => {
   const {
@@ -40,6 +41,18 @@ const VehicleCard = ({ vehicle, onViewDetails, onCompare }) => {
       removeFromComparison(id);
     } else if (canAddMore) {
       addToComparison(vehicle);
+    }
+  };
+
+  const handleAddToCart = async () => {
+    try {
+      console.log('Attempting to add vehicle to cart:', id);
+      await addVehicleToCart(id);
+      alert('Vehículo agregado al carrito');
+    } catch (error) {
+      console.error('Error al agregar al carrito', error);
+      const errorMessage = error.response?.data?.error || error.message || 'Error desconocido';
+      alert(`No se pudo agregar al carrito: ${errorMessage}`);
     }
   };
 
@@ -106,14 +119,13 @@ const VehicleCard = ({ vehicle, onViewDetails, onCompare }) => {
             Ver Detalles
           </button>
           <button 
-            className={`overlay-btn compare-btn ${isInComparison(id) ? 'in-comparison' : ''}`}
-            onClick={handleCompare}
-            disabled={!isInComparison(id) && !canAddMore}
+            className="overlay-btn compare-btn"
+            onClick={handleAddToCart}
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M9 3H7c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h2c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 14H7V5h2v12zm8-14h-2c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h2c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 14h-2V5h2v12z"/>
+              <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zm10 0c-1.1 0-1.99.9-1.99 2S15.9 22 17 22s2-.9 2-2-.9-2-2-2zM7.82 12.94l.03.05c.22.23.53.36.85.36h7.46c.54 0 1.02-.33 1.21-.84l2.54-6.79A1 1 0 0019 4H6.21l-.94-2H2v2h2l3.6 7.59-1.35 2.44C5.52 14.36 6.48 16 8 16h10v-2H8l1.82-3.06z"/>
             </svg>
-            {isInComparison(id) ? 'Quitar' : 'Comparar'}
+            Agregar al carrito
           </button>
         </div>
       </div>

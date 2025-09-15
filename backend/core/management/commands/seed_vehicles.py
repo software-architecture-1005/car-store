@@ -3,7 +3,7 @@ from django.db import transaction
 from faker import Faker
 import random
 
-from core.models import Make, Category, Vehicle
+from core.models import Make, Category, Vehicle, User, Buyer
 
 
 class Command(BaseCommand):
@@ -16,6 +16,27 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         fake = Faker('es_CO')
         count = options['count']
+
+        # Crear usuario por defecto para testing si no existe
+        test_user, created = User.objects.get_or_create(
+            username='testuser',
+            defaults={
+                'email': 'test@example.com',
+                'is_active': True
+            }
+        )
+        if created:
+            test_user.set_password('testpass123')
+            test_user.save()
+            self.stdout.write(self.style.SUCCESS('Created test user: testuser/testpass123'))
+
+        # Crear Buyer para el usuario de prueba
+        buyer, created = Buyer.objects.get_or_create(
+            user=test_user,
+            defaults={'usageProfile': 'General', 'preferences': []}
+        )
+        if created:
+            self.stdout.write(self.style.SUCCESS('Created test buyer'))
 
         makes = list(Make.objects.all())
         categories = list(Category.objects.all())

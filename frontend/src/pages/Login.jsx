@@ -17,7 +17,8 @@ const Login = ({ onNavigate }) => {
     
     try {
       const response = await login({ username: email, password });
-      authLogin({ isAuthenticated: true, email });
+      console.log('Login successful, tokens saved:', !!localStorage.getItem('accessToken'));
+      authLogin({ email });
       // Redirigir al home después del login exitoso
       if (onNavigate) {
         onNavigate('home');

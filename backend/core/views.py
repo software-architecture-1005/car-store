@@ -187,30 +187,104 @@ class ReviewViewSet(viewsets.ModelViewSet):
     
 class CartViewSet(viewsets.ModelViewSet):
     serializer_class = CartSerializer
-    #permission_classes = [IsAuthenticated]
-    permission_classes = [AllowAny]  # Temporalmente para pruebas
+    permission_classes = [AllowAny]  # Temporalmente para pruebas - permite tanto usuarios autenticados como anónimos
 
     def get_queryset(self):
         # Cada usuario solo puede ver su propio carrito
+        print(f"=== CART GET_QUERYSET ===")
+        print(f"User authenticated: {self.request.user.is_authenticated}")
+        print(f"User: {self.request.user}")
+        print(f"Auth header: {self.request.headers.get('Authorization', 'Not found')}")
+        
         try:
             # Usar el usuario autenticado si existe, sino usar usuario de prueba
             if self.request.user.is_authenticated:
                 user = self.request.user
+                print(f"Using authenticated user: {user.username}")
             else:
                 user = User.objects.first()  # Usar el primer usuario como prueba
+                print(f"Using first user for testing: {user.username if user else 'No users found'}")
             
             if user:
                 buyer, created = Buyer.objects.get_or_create(
                     user=user,
                     defaults={'usageProfile': 'General', 'preferences': []}
                 )
+                print(f"Buyer {'created' if created else 'found'}: {buyer}")
                 cart, created = Cart.objects.get_or_create(buyer=buyer)
-                return Cart.objects.filter(buyer=buyer)
+                print(f"Cart {'created' if created else 'found'}: {cart.id}")
+                queryset = Cart.objects.filter(buyer=buyer)
+                print(f"Queryset count: {queryset.count()}")
+                return queryset
             
+            print("No user found")
             return Cart.objects.none()
         except Exception as e:
             print(f"Error en get_queryset: {e}")
+            import traceback
+            traceback.print_exc()
             return Cart.objects.none()
+
+    def list(self, request, *args, **kwargs):
+        """Override list to return array directly instead of paginated response"""
+        print(f"=== CART LIST METHOD ===")
+        queryset = self.get_queryset()
+        print(f"Queryset from get_queryset: {queryset.count()} items")
+        serializer = self.get_serializer(queryset, many=True)
+        print(f"Serialized data: {len(serializer.data)} items")
+        print(f"Serialized content: {serializer.data}")
+        return Response(serializer.data)
+
+    @action(detail=False, methods=['post'])
+    def add_item(self, request):
+        """Agregar un vehículo al carrito del usuario actual sin requerir pk del carrito."""
+        print(f"=== CART ADD ITEM ===")
+        print(f"User authenticated: {request.user.is_authenticated}")
+        print(f"User: {request.user}")
+        print(f"Request data: {request.data}")
+        
+        try:
+            # Determinar usuario (autenticado o primer usuario para pruebas)
+            if request.user.is_authenticated:
+                user = request.user
+                print(f"Using authenticated user: {user.username}")
+            else:
+                user = User.objects.first()
+                print(f"Using first user for testing: {user.username if user else 'No users found'}")
+
+            if not user:
+                print("ERROR: No hay usuarios en la base de datos")
+                return Response({'error': 'No hay usuario disponible para crear carrito. Por favor, crea una cuenta primero.'}, status=status.HTTP_400_BAD_REQUEST)
+
+            buyer, created_buyer = Buyer.objects.get_or_create(
+                user=user,
+                defaults={'usageProfile': 'General', 'preferences': []}
+            )
+            print(f"Buyer {'created' if created_buyer else 'found'}: {buyer}")
+            
+            cart, created_cart = Cart.objects.get_or_create(buyer=buyer)
+            print(f"Cart {'created' if created_cart else 'found'}: {cart}")
+
+            vehicle_id = request.data.get('vehicle_id')
+            if not vehicle_id:
+                return Response({'error': 'Vehicle ID is required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+            try:
+                vehicle = Vehicle.objects.get(id=vehicle_id)
+                print(f"Vehicle found: {vehicle}")
+            except Vehicle.DoesNotExist:
+                print(f"ERROR: Vehicle {vehicle_id} not found")
+                return Response({'error': 'Vehicle not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+            cart_item, created = CartItem.objects.get_or_create(cart=cart, vehicle=vehicle)
+            print(f"CartItem {'created' if created else 'found'}: {cart_item}")
+            
+            serializer = CartSerializer(cart)
+            print(f"=== CART ADD SUCCESS ===")
+            return Response(serializer.data, status=status.HTTP_201_CREATED if created else status.HTTP_200_OK)
+        except Exception as e:
+            print(f"ERROR in add_item: {str(e)}")
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     @action(detail=True, methods=['post'])
     def add_item(self, request, pk=None):

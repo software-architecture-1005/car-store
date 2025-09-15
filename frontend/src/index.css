@@ -304,6 +304,18 @@ input::placeholder {
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
 }
 
+/* Force reset any stuck states - more specific for feature cards */
+.feature-card.hover-lift:not(:hover) {
+  transform: translateY(0) scale(1) !important;
+  box-shadow: none !important;
+}
+
+/* General reset for other hover-lift elements */
+.hover-lift:not(:hover):not(:active) {
+  transform: translateY(0) scale(1);
+  box-shadow: none;
+}
+
 .hover-glow:hover {
   box-shadow: 
     0 0 20px rgba(242, 68, 35, 0.4),

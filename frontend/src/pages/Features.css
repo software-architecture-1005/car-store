@@ -88,6 +88,16 @@
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
+  cursor: pointer;
+  /* Force reset all states */
+  transform: translateY(0) scale(1) !important;
+  box-shadow: none !important;
+  border-color: var(--border-color) !important;
+}
+
+/* Ensure no element inside can maintain focus */
+.feature-card * {
+  outline: none !important;
 }
 
 .feature-card::before {
@@ -102,13 +112,40 @@
   transition: transform 0.3s ease;
 }
 
+/* Only apply hover effects on actual hover */
 .feature-card:hover::before {
   transform: scaleX(1);
 }
 
 .feature-card:hover {
-  border-color: var(--accent-color);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  border-color: var(--accent-color) !important;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3) !important;
+  transform: translateY(-8px) scale(1.02) !important;
+}
+
+/* Force reset all other states */
+.feature-card:not(:hover) {
+  border-color: var(--border-color) !important;
+  box-shadow: none !important;
+  transform: translateY(0) scale(1) !important;
+}
+
+.feature-card:not(:hover)::before {
+  transform: scaleX(0) !important;
+}
+
+/* Disable all focus and active states */
+.feature-card:active,
+.feature-card:focus,
+.feature-card:focus-visible,
+.feature-card:focus-within {
+  outline: none !important;
+}
+
+.feature-card:active:not(:hover) {
+  transform: translateY(0) scale(1) !important;
+  box-shadow: none !important;
+  border-color: var(--border-color) !important;
 }
 
 .feature-icon {

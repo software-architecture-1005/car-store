@@ -314,32 +314,46 @@ const VehicleComparison = () => {
         {!loading && (
           <div className="available-vehicles-section">
             <h2 className="section-title">Vehículos Disponibles para Comparar</h2>
-            <div className="available-vehicles-grid">
-              {allVehicles.map(vehicle => (
-                <div key={vehicle.id} className="available-vehicle-card">
-                  <div className="vehicle-image">
-                    <img src={vehicle.image} alt={`${vehicle.brand} ${vehicle.model}`} />
+            <div className="vehicles-grid">
+              {allVehicles.map(vehicle => {
+                // Generar análisis para calcular puntuación general
+                const yearScore = Math.min(10, (vehicle.year - 2010) / 2 + 5);
+                const priceScore = Math.max(5, 10 - (vehicle.price / 100000000));
+                const overallScore = ((8.0 + 8.5 + 8.2 + 8.0 + priceScore) / 5);
+                
+                return (
+                  <div 
+                    key={vehicle.id}
+                    className={`vehicle-option comparison-vehicle ${isInComparison(vehicle.id) ? 'in-comparison' : ''}`}
+                  >
+                    <div className="vehicle-image">
+                      <img src={vehicle.image} alt={`${vehicle.brand} ${vehicle.model}`} />
+                    </div>
+                    <div className="vehicle-info">
+                      <h4 className="vehicle-name">{vehicle.year} {vehicle.brand} {vehicle.model}</h4>
+                      <div className="vehicle-score">
+                        <span className="score-label">Puntuación General:</span>
+                        <div className="overall-score">
+                          {overallScore.toFixed(1)}
+                        </div>
+                      </div>
+                      <button 
+                        className={`btn-primary add-to-comparison-btn ${isInComparison(vehicle.id) ? 'in-comparison' : ''}`}
+                        onClick={() => {
+                          if (isInComparison(vehicle.id)) {
+                            removeFromComparison(vehicle.id);
+                          } else if (canAddMore) {
+                            addToComparison(vehicle);
+                          }
+                        }}
+                        disabled={!isInComparison(vehicle.id) && !canAddMore}
+                      >
+                        {isInComparison(vehicle.id) ? 'En Comparación' : 'Agregar a Comparación'}
+                      </button>
+                    </div>
                   </div>
-                  <div className="vehicle-info">
-                    <h4>{vehicle.year} {vehicle.brand} {vehicle.model}</h4>
-                    <p className="vehicle-price">{formatPrice(vehicle.price)}</p>
-                    <p className="vehicle-category">{vehicle.category}</p>
-                    <button 
-                      className={`btn-primary add-to-comparison-btn ${isInComparison(vehicle.id) ? 'in-comparison' : ''}`}
-                      onClick={() => {
-                        if (isInComparison(vehicle.id)) {
-                          removeFromComparison(vehicle.id);
-                        } else if (canAddMore) {
-                          addToComparison(vehicle);
-                        }
-                      }}
-                      disabled={!isInComparison(vehicle.id) && !canAddMore}
-                    >
-                      {isInComparison(vehicle.id) ? 'En Comparación' : 'Agregar a Comparación'}
-                    </button>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         )}

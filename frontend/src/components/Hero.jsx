@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './Hero.css';
+import { getMakes } from '../services/makeService';
 
 const Hero = ({ onSearch }) => {
   const [searchData, setSearchData] = useState({
@@ -7,6 +8,19 @@ const Hero = ({ onSearch }) => {
     model: '',
     budget: ''
   });
+  const [makes, setMakes] = useState([]);
+
+  useEffect(() => {
+    const loadMakes = async () => {
+      try {
+        const makesData = await getMakes();
+        setMakes(makesData);
+      } catch (error) {
+        console.error('Error loading makes:', error);
+      }
+    };
+    loadMakes();
+  }, []);
 
   const handleSearchChange = (field, value) => {
     setSearchData(prev => ({
@@ -17,6 +31,7 @@ const Hero = ({ onSearch }) => {
 
   const handleSearch = (e) => {
     e.preventDefault();
+    console.log('Hero search submitted with data:', searchData);
     if (onSearch) {
       onSearch(searchData);
     }
@@ -54,14 +69,11 @@ const Hero = ({ onSearch }) => {
                     className="search-select"
                   >
                     <option value="">Selecciona marca</option>
-                    <option value="toyota">Toyota</option>
-                    <option value="honda">Honda</option>
-                    <option value="nissan">Nissan</option>
-                    <option value="mazda">Mazda</option>
-                    <option value="hyundai">Hyundai</option>
-                    <option value="kia">Kia</option>
-                    <option value="chevrolet">Chevrolet</option>
-                    <option value="ford">Ford</option>
+                    {makes.map(make => (
+                      <option key={make.id} value={make.name}>
+                        {make.name}
+                      </option>
+                    ))}
                   </select>
                   <svg className="dropdown-icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M7 10l5 5 5-5z"/>
@@ -91,11 +103,11 @@ const Hero = ({ onSearch }) => {
                     className="search-select"
                   >
                     <option value="">Rango de precio</option>
-                    <option value="0-50">$0 - $50M</option>
-                    <option value="50-100">$50M - $100M</option>
-                    <option value="100-150">$100M - $150M</option>
-                    <option value="150-200">$150M - $200M</option>
-                    <option value="200+">$200M+</option>
+                    <option value="0-15000">$0 - $15.000</option>
+                    <option value="15000-30000">$15.000 - $30.000</option>
+                    <option value="30000-45000">$30.000 - $45.000</option>
+                    <option value="45000-60000">$45.000 - $60.000</option>
+                    <option value="60000+">$60.000+</option>
                   </select>
                   <svg className="dropdown-icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M7 10l5 5 5-5z"/>
