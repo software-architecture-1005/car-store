@@ -12,7 +12,7 @@ router.register(r'roles', views.RoleViewSet, 'roles')
 router.register(r'buyers', views.BuyerViewSet, 'buyers')
 router.register(r'experts', views.ExpertViewSet, 'experts')
 router.register(r'reviews', views.ReviewViewSet, 'reviews')
-router.register(r'carts', views.CartViewSet, 'cart')
+router.register(r'cart', views.CartViewSet, 'cart')
 
 urlpatterns = [
     # Versionado de la api

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { getCart, removeItemFromCart } from '../services/cartApi';
-import './CartView.css'; // Crearemos este archivo para los estilos
+import './CartPage.css'; // Crearemos este archivo para los estilos
 
-const CartView = () => {
+const CartPage = () => {
   const [cart, setCart] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -86,4 +86,4 @@ const CartView = () => {
   );
 };
 
-export default CartView;
+export default CartPage;

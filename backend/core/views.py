@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework import viewsets
 from .services import VehicleSearch
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny
 from rest_framework import status
 # Esto de abajo es para importar los datos serializados y mostrarlos en la vista
 from .serializer import (
@@ -98,14 +99,21 @@ class ReviewViewSet(viewsets.ModelViewSet):
     
 class CartViewSet(viewsets.ModelViewSet):
     serializer_class = CartSerializer
-    permission_classes = [IsAuthenticated]
+    #permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]  # Temporalmente para pruebas
 
     def get_queryset(self):
         # Cada usuario solo puede ver su propio carrito
-        user = self.request.user
-        # Buscamos el perfil de comprador asociado a este usuario
-        buyer = Buyer.objects.get(user=user)
-        return Cart.objects.filter(buyer=buyer)
+        try:
+            user = User.objects.get(id=1) # <-- O el ID del usuario de prueba que quieras usar
+            buyer = Buyer.objects.get(user=user)
+            return Cart.objects.filter(buyer=buyer)
+        except User.DoesNotExist:
+            return Cart.objects.none() # Devuelve un queryset vacío si el usuario de prueba no existe
+        # user = self.request.user
+        # # Buscamos el perfil de comprador asociado a este usuario
+        # buyer = Buyer.objects.get(user=user)
+        # return Cart.objects.filter(buyer=buyer)
 
     @action(detail=True, methods=['post'])
     def add_item(self, request, pk=None):

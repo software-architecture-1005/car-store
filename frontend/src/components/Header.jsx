@@ -47,6 +47,12 @@ const Header = ({ currentPage, onNavigate }) => {
           >
             Características
           </button>
+          <button 
+            className="nav-link"
+            onClick={() => handleNavigation('cart')}
+          >
+            Cart
+          </button>
         </nav>
 
       </div>

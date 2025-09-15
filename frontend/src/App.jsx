@@ -6,6 +6,7 @@ import SearchResults from './pages/SearchResults';
 import VehicleDetails from './pages/VehicleDetails';
 import VehicleComparison from './pages/VehicleComparison';
 import Features from './pages/Features';
+import CartPage from './pages/CartPage';
 import './App.css';
 
 function App() {
@@ -34,6 +35,8 @@ function App() {
 
   const renderPage = () => {
     switch (currentPage) {
+      case 'cart':
+        return <CartPage onViewDetails={handleViewDetails} />;
       case 'search':
         return <SearchResults onViewDetails={handleViewDetails} />;
       case 'details':
