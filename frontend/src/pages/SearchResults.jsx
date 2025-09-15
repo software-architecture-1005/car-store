@@ -1,138 +1,146 @@
 import React, { useState, useEffect } from 'react';
 import SearchFilters from '../components/SearchFilters';
 import VehicleCard from '../components/VehicleCard';
+import { getVehicles, searchVehicles } from '../services/vehicleService';
+import { getMakes } from '../services/makeService';
+import { getCategories } from '../services/categoryService';
 import './SearchResults.css';
 
-const SearchResults = ({ onViewDetails }) => {
+const SearchResults = ({ onViewDetails, initialFilters }) => {
+  console.log('SearchResults renderizado');
+  console.log('Initial filters received:', initialFilters);
+  
   const [filters, setFilters] = useState({
     search: '',
-    location: '',
     priceMin: '',
     priceMax: '',
     brands: [],
-    bodyStyle: '',
-    transmission: '',
-    fuelTypes: [],
     yearFrom: '',
     yearTo: '',
-    colors: []
+    color: '',
+    category: ''
   });
 
   const [vehicles, setVehicles] = useState([]);
   const [filteredVehicles, setFilteredVehicles] = useState([]);
+  const [sortedVehicles, setSortedVehicles] = useState([]);
   const [sortBy, setSortBy] = useState('bestMatch');
   const [loading, setLoading] = useState(true);
+  const [makes, setMakes] = useState([]);
+  const [categories, setCategories] = useState([]);
 
-  // Mock data - En una aplicación real, esto vendría de una API
+  // Aplicar filtros iniciales del hero
   useEffect(() => {
-    const mockVehicles = [
-      {
-        id: 1,
-        image: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=400&h=300&fit=crop',
-        brand: 'Toyota',
-        model: 'Corolla',
-        year: 2023,
-        price: 85000000,
-        rating: 4.7,
-        specifications: [
-          { icon: '⚡', value: 'Híbrido' },
-          { icon: '🔄', value: 'CVT' },
-          { icon: '👥', value: '5 pasajeros' }
-        ],
-        location: 'Bogotá, Colombia',
-        isAvailable: true,
-        isPromoted: false
-      },
-      {
-        id: 2,
-        image: 'https://images.unsplash.com/photo-1549317331-15d33c1eef14?w=400&h=300&fit=crop',
-        brand: 'Honda',
-        model: 'Civic',
-        year: 2023,
-        price: 92000000,
-        rating: 4.8,
-        specifications: [
-          { icon: '⛽', value: 'Gasolina' },
-          { icon: '🔄', value: 'Automática' },
-          { icon: '👥', value: '5 pasajeros' }
-        ],
-        location: 'Medellín, Colombia',
-        isAvailable: true,
-        isPromoted: true
-      },
-      {
-        id: 3,
-        image: 'https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?w=400&h=300&fit=crop',
-        brand: 'Nissan',
-        model: 'Sentra',
-        year: 2022,
-        price: 78000000,
-        rating: 4.5,
-        specifications: [
-          { icon: '⛽', value: 'Gasolina' },
-          { icon: '🔄', value: 'CVT' },
-          { icon: '👥', value: '5 pasajeros' }
-        ],
-        location: 'Cali, Colombia',
-        isAvailable: true,
-        isPromoted: false
-      },
-      {
-        id: 4,
-        image: 'https://images.unsplash.com/photo-1555215695-3004980ad54e?w=400&h=300&fit=crop',
-        brand: 'Mazda',
-        model: 'CX-5',
-        year: 2023,
-        price: 125000000,
-        rating: 4.9,
-        specifications: [
-          { icon: '⛽', value: 'Gasolina' },
-          { icon: '🔄', value: 'Automática' },
-          { icon: '👥', value: '7 pasajeros' }
-        ],
-        location: 'Bogotá, Colombia',
-        isAvailable: true,
-        isPromoted: false
-      },
-      {
-        id: 5,
-        image: 'https://images.unsplash.com/photo-1563720223185-11003d516935?w=400&h=300&fit=crop',
-        brand: 'Hyundai',
-        model: 'Tucson',
-        year: 2023,
-        price: 110000000,
-        rating: 4.6,
-        specifications: [
-          { icon: '⛽', value: 'Gasolina' },
-          { icon: '🔄', value: 'Automática' },
-          { icon: '👥', value: '5 pasajeros' }
-        ],
-        location: 'Barranquilla, Colombia',
-        isAvailable: false,
-        isPromoted: false
-      },
-      {
-        id: 6,
-        image: 'https://images.unsplash.com/photo-1583121274602-3e2820c69888?w=400&h=300&fit=crop',
-        brand: 'Kia',
-        model: 'Sportage',
-        year: 2023,
-        price: 98000000,
-        rating: 4.4,
-        specifications: [
-          { icon: '⛽', value: 'Gasolina' },
-          { icon: '🔄', value: 'Automática' },
-          { icon: '👥', value: '5 pasajeros' }
-        ],
-        location: 'Cartagena, Colombia',
-        isAvailable: true,
-        isPromoted: false
+    if (initialFilters) {
+      console.log('Applying initial filters:', initialFilters);
+      const newFilters = { ...filters };
+      
+      // Mapear brand del hero a brands array
+      if (initialFilters.brand) {
+        console.log('Hero brand received:', initialFilters.brand);
+        newFilters.brands = [initialFilters.brand];
+        console.log('Brands array set to:', newFilters.brands);
       }
-    ];
+      
+      // Mapear model del hero a search
+      if (initialFilters.model) {
+        newFilters.search = initialFilters.model;
+      }
+      
+      // Mapear budget del hero a priceMin y priceMax
+      if (initialFilters.budget) {
+        console.log('Hero budget received:', initialFilters.budget);
+        const [min, max] = initialFilters.budget.split('-');
+        console.log('Split budget - min:', min, 'max:', max);
+        
+        if (min) {
+          newFilters.priceMin = parseFloat(min);
+          console.log('Price min set from hero:', newFilters.priceMin);
+        }
+        if (max) {
+          if (max === '+') {
+            // Para rangos con "+", solo establecer priceMin
+            newFilters.priceMin = parseFloat(min);
+            console.log('Price min set for + range:', newFilters.priceMin);
+          } else {
+            newFilters.priceMax = parseFloat(max);
+            console.log('Price max set from hero:', newFilters.priceMax);
+          }
+        }
+      }
+      
+      console.log('New filters after mapping:', newFilters);
+      setFilters(newFilters);
+      
+      // Marcar que hay filtros activos para ejecutar búsqueda automáticamente
+      setTimeout(() => {
+        performSearch(newFilters);
+      }, 100);
+    }
+  }, [initialFilters]);
 
-    setVehicles(mockVehicles);
-    setFilteredVehicles(mockVehicles);
-    setLoading(false);
+  // Cargar datos iniciales del backend
+  useEffect(() => {
+    const loadInitialData = async () => {
+      try {
+        setLoading(true);
+        
+        // Cargar vehículos, marcas y categorías en paralelo
+        const [vehiclesData, makesData, categoriesData] = await Promise.all([
+          getVehicles(),
+          getMakes(),
+          getCategories()
+        ]);
+        
+        // Transformar datos del backend al formato esperado por el frontend
+        const transformedVehicles = vehiclesData.map(vehicle => ({
+          id: vehicle.id,
+          image: vehicle.image ? `http://localhost:8000${vehicle.image}` : '/images/default-car.jpg',
+          brand: vehicle.make_name || vehicle.make?.name || 'Sin marca',
+          model: vehicle.model,
+          year: vehicle.year,
+          price: parseFloat(vehicle.price),
+          color: vehicle.color,
+          category: vehicle.category_name || vehicle.category?.name || 'Sin categoría',
+          make_id: vehicle.make,
+          category_id: vehicle.category,
+          // Datos adicionales para compatibilidad visual
+          rating: 4.5,
+          specifications: [
+            { icon: '⛽', value: 'Gasolina' },
+            { icon: '🔄', value: 'Automática' },
+            { icon: '👥', value: '5 pasajeros' }
+          ],
+          location: 'Colombia',
+          isAvailable: true,
+          isPromoted: false
+        }));
+
+        setVehicles(transformedVehicles);
+        setFilteredVehicles(transformedVehicles);
+        setSortedVehicles(transformedVehicles);
+        setMakes(makesData);
+        setCategories(categoriesData);
+        
+        console.log('Datos cargados:', {
+          vehicles: transformedVehicles.length,
+          makes: makesData.length,
+          categories: categoriesData.length
+        });
+        console.log('Primeros 3 vehículos:', transformedVehicles.slice(0, 3));
+      } catch (error) {
+        console.error('Error cargando datos iniciales:', error);
+        setVehicles([]);
+        setFilteredVehicles([]);
+        setSortedVehicles([]);
+        setMakes([]);
+        setCategories([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadInitialData();
   }, []);
 
   const handleFilterChange = (filterType, value) => {
@@ -157,52 +165,105 @@ const SearchResults = ({ onViewDetails }) => {
     // Agregar a la comparación
   };
 
-  // Filtrar vehículos basado en los filtros aplicados
-  useEffect(() => {
-    let filtered = [...vehicles];
-
-    // Filtro de búsqueda
-    if (filters.search) {
-      const searchTerm = filters.search.toLowerCase();
-      filtered = filtered.filter(vehicle =>
-        vehicle.brand.toLowerCase().includes(searchTerm) ||
-        vehicle.model.toLowerCase().includes(searchTerm) ||
-        `${vehicle.brand} ${vehicle.model}`.toLowerCase().includes(searchTerm)
-      );
+  // Función para realizar búsqueda manual
+  const performSearch = async (customFilters = null) => {
+    console.log('=== PERFORM SEARCH CALLED ===');
+    console.log('Custom filters:', customFilters);
+    console.log('Current filters:', filters);
+    try {
+      setLoading(true);
+      
+      const filtersToUse = customFilters || filters;
+      
+      // Preparar parámetros para la búsqueda del backend
+      const searchParams = {};
+      
+      if (filtersToUse.search) {
+        searchParams.search = filtersToUse.search;
+      }
+      
+      if (filtersToUse.priceMin) {
+        searchParams.price_min = parseFloat(filtersToUse.priceMin);
+        console.log('Price min set to:', searchParams.price_min);
+      }
+      
+      if (filtersToUse.priceMax) {
+        searchParams.price_max = parseFloat(filtersToUse.priceMax);
+        console.log('Price max set to:', searchParams.price_max);
+      }
+      
+      if (filtersToUse.yearFrom) {
+        searchParams.year_from = parseInt(filtersToUse.yearFrom);
+      }
+      
+      if (filtersToUse.yearTo) {
+        searchParams.year_to = parseInt(filtersToUse.yearTo);
+      }
+      
+      if (filtersToUse.brands && filtersToUse.brands.length > 0) {
+        searchParams.brands = filtersToUse.brands;
+      }
+      
+      if (filtersToUse.color) {
+        searchParams.color = filtersToUse.color;
+      }
+      
+      if (filtersToUse.category) {
+        searchParams.category_id = filtersToUse.category;
+      }
+      
+      console.log('Parámetros de búsqueda enviados:', searchParams);
+      console.log('Filtros activos:', filtersToUse);
+      
+      // Verificar si hay algún filtro activo
+      const hasActiveFilters = Object.keys(searchParams).length > 0;
+      
+      if (hasActiveFilters) {
+        // Hay filtros activos, usar búsqueda del backend
+        const results = await searchVehicles(searchParams);
+        console.log('Resultados del backend:', results);
+        
+        // Adaptar resultados a la tarjeta
+        const adapted = results.map(vehicle => ({
+        id: vehicle.id,
+        image: vehicle.image ? `http://localhost:8000${vehicle.image}` : '/images/default-car.jpg',
+        brand: vehicle.make_name || vehicle.make?.name || 'Sin marca',
+        model: vehicle.model,
+        year: vehicle.year,
+        price: parseFloat(vehicle.price),
+        color: vehicle.color,
+        category: vehicle.category_name || vehicle.category?.name || 'Sin categoría',
+        make_id: vehicle.make,
+        category_id: vehicle.category,
+        rating: 4.5,
+        specifications: [
+          { icon: '⛽', value: 'Gasolina' },
+          { icon: '🔄', value: 'Automática' },
+          { icon: '👥', value: '5 pasajeros' }
+        ],
+        location: 'Colombia',
+        isAvailable: true,
+        isPromoted: false
+        }));
+        
+        console.log('Vehículos adaptados:', adapted);
+        setFilteredVehicles(adapted);
+      } else {
+        // No hay filtros activos, usar los vehículos ya cargados
+        console.log('No hay filtros activos, mostrando todos los vehículos cargados');
+        setFilteredVehicles(vehicles);
+      }
+    } catch (error) {
+      console.error('Error en búsqueda del backend:', error);
+      console.error('Detalles del error:', error.response?.data);
+      
+      // En caso de error, mostrar todos los vehículos
+      setFilteredVehicles(vehicles);
+      setSortedVehicles(vehicles);
+    } finally {
+      setLoading(false);
     }
-
-    // Filtro de ubicación
-    if (filters.location) {
-      filtered = filtered.filter(vehicle =>
-        vehicle.location.toLowerCase().includes(filters.location.toLowerCase())
-      );
-    }
-
-    // Filtro de precio
-    if (filters.priceMin) {
-      filtered = filtered.filter(vehicle => vehicle.price >= parseInt(filters.priceMin) * 1000000);
-    }
-    if (filters.priceMax) {
-      filtered = filtered.filter(vehicle => vehicle.price <= parseInt(filters.priceMax) * 1000000);
-    }
-
-    // Filtro de marcas
-    if (filters.brands && filters.brands.length > 0) {
-      filtered = filtered.filter(vehicle =>
-        filters.brands.includes(vehicle.brand)
-      );
-    }
-
-    // Filtro de año
-    if (filters.yearFrom) {
-      filtered = filtered.filter(vehicle => vehicle.year >= parseInt(filters.yearFrom));
-    }
-    if (filters.yearTo) {
-      filtered = filtered.filter(vehicle => vehicle.year <= parseInt(filters.yearTo));
-    }
-
-    setFilteredVehicles(filtered);
-  }, [filters, vehicles]);
+  };
 
   // Ordenar vehículos
   useEffect(() => {
@@ -226,7 +287,7 @@ const SearchResults = ({ onViewDetails }) => {
         break;
     }
 
-    setFilteredVehicles(sorted);
+    setSortedVehicles(sorted);
   }, [sortBy, filteredVehicles]);
 
   if (loading) {
@@ -246,6 +307,9 @@ const SearchResults = ({ onViewDetails }) => {
           <SearchFilters 
             filters={filters}
             onFilterChange={handleFilterChange}
+            makes={makes}
+            categories={categories}
+            onSearch={performSearch}
           />
         </aside>
 
@@ -255,7 +319,7 @@ const SearchResults = ({ onViewDetails }) => {
           <div className="results-header">
             <div className="results-info">
               <h2 className="results-title">
-                Mostrando {filteredVehicles.length} vehículos
+                Mostrando {sortedVehicles.length} vehículos
               </h2>
               <p className="results-subtitle">
                 Encuentra el vehículo perfecto para ti
@@ -283,8 +347,8 @@ const SearchResults = ({ onViewDetails }) => {
 
           {/* Grid de vehículos */}
           <div className="vehicles-grid">
-            {filteredVehicles.length > 0 ? (
-              filteredVehicles.map(vehicle => (
+            {sortedVehicles.length > 0 ? (
+              sortedVehicles.map(vehicle => (
                 <VehicleCard
                   key={vehicle.id}
                   vehicle={vehicle}
@@ -299,19 +363,19 @@ const SearchResults = ({ onViewDetails }) => {
                 <p>Intenta ajustar tus filtros de búsqueda</p>
                 <button 
                   className="btn-primary"
-                  onClick={() => setFilters({
-                    search: '',
-                    location: '',
-                    priceMin: '',
-                    priceMax: '',
-                    brands: [],
-                    bodyStyle: '',
-                    transmission: '',
-                    fuelTypes: [],
-                    yearFrom: '',
-                    yearTo: '',
-                    colors: []
-                  })}
+                  onClick={() => {
+                    const resetFilters = {
+                      search: '',
+                      priceMin: '',
+                      priceMax: '',
+                      brands: [],
+                      yearFrom: '',
+                      yearTo: '',
+                      color: '',
+                      category: ''
+                    };
+                    setFilters(resetFilters);
+                  }}
                 >
                   Limpiar Filtros
                 </button>
@@ -320,7 +384,7 @@ const SearchResults = ({ onViewDetails }) => {
           </div>
 
           {/* Paginación */}
-          {filteredVehicles.length > 0 && (
+          {sortedVehicles.length > 0 && (
             <div className="pagination">
               <button className="pagination-btn" disabled>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">

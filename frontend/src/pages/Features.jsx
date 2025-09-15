@@ -1,8 +1,79 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import VehicleAnalysis from '../components/VehicleAnalysis';
+import { getVehicles } from '../services/vehicleService';
 import './Features.css';
 
 const Features = () => {
+  const [vehicles, setVehicles] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedVehicle, setSelectedVehicle] = useState(null);
+
+  useEffect(() => {
+    const loadVehicles = async () => {
+      try {
+        setLoading(true);
+        const data = await getVehicles();
+        const transformedVehicles = data.map(vehicle => ({
+          id: vehicle.id,
+          image: vehicle.image ? `http://localhost:8000${vehicle.image}` : '/images/default-car.jpg',
+          brand: vehicle.make_name || vehicle.make?.name || 'Sin marca',
+          model: vehicle.model,
+          year: vehicle.year,
+          price: parseFloat(vehicle.price),
+          color: vehicle.color,
+          category: vehicle.category_name || vehicle.category?.name || 'Sin categoría',
+          rating: 4.5,
+          specifications: {
+            engine: 'Motor estándar',
+            power: 'Potencia estándar',
+            transmission: 'Automática',
+            fuelType: 'Gasolina',
+            seats: 5,
+            doors: 4
+          },
+          features: [
+            'Sistema de seguridad estándar',
+            'Conectividad básica',
+            'Comodidad para pasajeros',
+            'Eficiencia de combustible'
+          ]
+        }));
+        setVehicles(transformedVehicles);
+        if (transformedVehicles.length > 0) {
+          setSelectedVehicle(transformedVehicles[0]);
+        }
+      } catch (error) {
+        console.error('Error cargando vehículos:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadVehicles();
+  }, []);
+
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat('es-CO', {
+      style: 'currency',
+      currency: 'COP',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    }).format(price);
+  };
+
+  if (loading) {
+    return (
+      <div className="features-page">
+        <div className="features-container">
+          <div className="loading-spinner">
+            <div className="spinner"></div>
+            <p>Cargando vehículos...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="features-page">
       <div className="features-container">
@@ -80,7 +151,7 @@ const Features = () => {
 
         {/* Vehicle Analysis Section */}
         <div className="analysis-section">
-          <VehicleAnalysis />
+          <VehicleAnalysis vehicles={vehicles} selectedVehicle={selectedVehicle} onSelectVehicle={setSelectedVehicle} />
         </div>
 
         {/* CTA Section */}

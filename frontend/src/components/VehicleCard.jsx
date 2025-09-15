@@ -1,5 +1,7 @@
 import React from 'react';
 import './VehicleCard.css';
+import { useComparison } from '../contexts/ComparisonContext';
+import { addVehicleToCart } from '../services/cartService';
 
 const VehicleCard = ({ vehicle, onViewDetails, onCompare }) => {
   const {
@@ -9,12 +11,50 @@ const VehicleCard = ({ vehicle, onViewDetails, onCompare }) => {
     model,
     year,
     price,
+    color,
+    category,
     rating,
     specifications,
     location,
     isAvailable,
     isPromoted
   } = vehicle;
+
+  // Verificar que el contexto esté disponible
+  let comparisonContext;
+  try {
+    comparisonContext = useComparison();
+  } catch (error) {
+    console.warn('ComparisonContext no disponible:', error);
+    comparisonContext = {
+      addToComparison: () => {},
+      removeFromComparison: () => {},
+      isInComparison: () => false,
+      canAddMore: true
+    };
+  }
+
+  const { addToComparison, removeFromComparison, isInComparison, canAddMore } = comparisonContext;
+  
+  const handleCompare = () => {
+    if (isInComparison(id)) {
+      removeFromComparison(id);
+    } else if (canAddMore) {
+      addToComparison(vehicle);
+    }
+  };
+
+  const handleAddToCart = async () => {
+    try {
+      console.log('Attempting to add vehicle to cart:', id);
+      await addVehicleToCart(id);
+      alert('Vehículo agregado al carrito');
+    } catch (error) {
+      console.error('Error al agregar al carrito', error);
+      const errorMessage = error.response?.data?.error || error.message || 'Error desconocido';
+      alert(`No se pudo agregar al carrito: ${errorMessage}`);
+    }
+  };
 
   const formatPrice = (price) => {
     return new Intl.NumberFormat('es-CO', {
@@ -80,12 +120,12 @@ const VehicleCard = ({ vehicle, onViewDetails, onCompare }) => {
           </button>
           <button 
             className="overlay-btn compare-btn"
-            onClick={() => onCompare(id)}
+            onClick={handleAddToCart}
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M9 3H7c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h2c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 14H7V5h2v12zm8-14h-2c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h2c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 14h-2V5h2v12z"/>
+              <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zm10 0c-1.1 0-1.99.9-1.99 2S15.9 22 17 22s2-.9 2-2-.9-2-2-2zM7.82 12.94l.03.05c.22.23.53.36.85.36h7.46c.54 0 1.02-.33 1.21-.84l2.54-6.79A1 1 0 0019 4H6.21l-.94-2H2v2h2l3.6 7.59-1.35 2.44C5.52 14.36 6.48 16 8 16h10v-2H8l1.82-3.06z"/>
             </svg>
-            Comparar
+            Agregar al carrito
           </button>
         </div>
       </div>
@@ -112,6 +152,17 @@ const VehicleCard = ({ vehicle, onViewDetails, onCompare }) => {
           ))}
         </div>
 
+        <div className="vehicle-details">
+          <div className="detail-item">
+            <span className="detail-label">Color:</span>
+            <span className="detail-value">{color}</span>
+          </div>
+          <div className="detail-item">
+            <span className="detail-label">Categoría:</span>
+            <span className="detail-value">{category}</span>
+          </div>
+        </div>
+
         <div className="vehicle-location">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
             <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
@@ -121,9 +172,8 @@ const VehicleCard = ({ vehicle, onViewDetails, onCompare }) => {
 
         <div className="card-footer">
           <div className="price-container">
-            <span className="price-label">Desde</span>
+            <span className="price-label">Precio</span>
             <span className="price-value">{formatPrice(price)}</span>
-            <span className="price-period">/mes</span>
           </div>
           
           <div className="availability">

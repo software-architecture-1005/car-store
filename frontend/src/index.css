@@ -4,6 +4,7 @@
 :root {
   /* Color Palette */
   --primary-bg: #1A1A1A;
+  --primary-bg-gradient: linear-gradient(135deg, #1A1A1A 0%, #2A2A2A 100%);
   --secondary-bg: #2A2A2A;
   --accent-color: #F24423;
   --accent-hover: #E03A1A;
@@ -301,6 +302,18 @@ input::placeholder {
 .hover-lift:hover {
   transform: translateY(-8px) scale(1.02);
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+/* Force reset any stuck states - more specific for feature cards */
+.feature-card.hover-lift:not(:hover) {
+  transform: translateY(0) scale(1) !important;
+  box-shadow: none !important;
+}
+
+/* General reset for other hover-lift elements */
+.hover-lift:not(:hover):not(:active) {
+  transform: translateY(0) scale(1);
+  box-shadow: none;
 }
 
 .hover-glow:hover {

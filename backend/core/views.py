@@ -79,15 +79,86 @@ class VehicleViewSet(viewsets.ModelViewSet):
             return Response(serializer.data)
         return Response([])
     
-    # Acción avanzada: búsqueda compleja (USANDO TU SERVICIO)
+    # Acción avanzada: búsqueda inteligente (USANDO TU SERVICIO)
     @action(detail=False, methods=['get'])
     def search(self, request):
-        # Aquí es donde usamos tu VehicleSearch service
+        # Debug: imprimir parámetros recibidos
+        print("=== BÚSQUEDA INTELIGENTE ===")
+        print("Parámetros recibidos:", dict(request.GET))
+        print("QueryDict completo:", request.GET)
+        print("Brands específicamente:", request.GET.getlist('brands'))
+        
+        # Verificar si hay algún parámetro de búsqueda
+        has_params = any([
+            request.GET.get('search'),
+            request.GET.get('price_min'),
+            request.GET.get('price_max'),
+            request.GET.get('year_from'),
+            request.GET.get('year_to'),
+            request.GET.getlist('brands'),
+        ])
+        
+        print(f"¿Hay parámetros de búsqueda? {has_params}")
+        
+        # Usar el servicio de búsqueda inteligente
         search_service = VehicleSearch(request.GET)
         vehicles = search_service.execute()
         
+        print(f"Vehículos encontrados: {vehicles.count()}")
+        print("Primeros 3 vehículos:")
+        for v in vehicles[:3]:
+            print(f"  - {v.year} {v.make.name} {v.model}")
+        print("=== FIN BÚSQUEDA ===")
+        
         serializer = self.get_serializer(vehicles, many=True)
         return Response(serializer.data)
+    
+    # Acción para obtener sugerencias de búsqueda
+    @action(detail=False, methods=['get'])
+    def suggestions(self, request):
+        """Obtener sugerencias para autocompletado"""
+        query = request.GET.get('q', '').strip()
+        suggestions = []
+        
+        if len(query) >= 2:
+            # Buscar en modelos
+            models = Vehicle.objects.filter(
+                model__icontains=query
+            ).values_list('model', flat=True).distinct()[:5]
+            
+            # Buscar en marcas
+            makes = Make.objects.filter(
+                name__icontains=query
+            ).values_list('name', flat=True).distinct()[:5]
+            
+            # Buscar en categorías
+            categories = Category.objects.filter(
+                name__icontains=query
+            ).values_list('name', flat=True).distinct()[:5]
+            
+            suggestions = {
+                'models': list(models),
+                'makes': list(makes),
+                'categories': list(categories)
+            }
+        
+        return Response(suggestions)
+    
+    # Acción para debug - verificar datos
+    @action(detail=False, methods=['get'])
+    def debug(self, request):
+        """Endpoint para debug - verificar qué datos tenemos"""
+        debug_info = {
+            'total_vehicles': Vehicle.objects.count(),
+            'total_makes': Make.objects.count(),
+            'total_categories': Category.objects.count(),
+            'makes': list(Make.objects.values('id', 'name')),
+            'categories': list(Category.objects.values('id', 'name')),
+            'vehicles_sample': list(Vehicle.objects.select_related('make', 'category').values(
+                'id', 'model', 'make__name', 'category__name', 'year', 'price'
+            )[:5])
+        }
+        return Response(debug_info)
     
 class ReviewViewSet(viewsets.ModelViewSet):
     queryset = Review.objects.all()
@@ -116,21 +187,104 @@ class ReviewViewSet(viewsets.ModelViewSet):
     
 class CartViewSet(viewsets.ModelViewSet):
     serializer_class = CartSerializer
-    #permission_classes = [IsAuthenticated]
-    permission_classes = [AllowAny]  # Temporalmente para pruebas
+    permission_classes = [AllowAny]  # Temporalmente para pruebas - permite tanto usuarios autenticados como anónimos
 
     def get_queryset(self):
         # Cada usuario solo puede ver su propio carrito
+        print(f"=== CART GET_QUERYSET ===")
+        print(f"User authenticated: {self.request.user.is_authenticated}")
+        print(f"User: {self.request.user}")
+        print(f"Auth header: {self.request.headers.get('Authorization', 'Not found')}")
+        
         try:
-            user = User.objects.get(id=1) # <-- O el ID del usuario de prueba que quieras usar
-            buyer = Buyer.objects.get(user=user)
-            return Cart.objects.filter(buyer=buyer)
-        except User.DoesNotExist:
-            return Cart.objects.none() # Devuelve un queryset vacío si el usuario de prueba no existe
-        # user = self.request.user
-        # # Buscamos el perfil de comprador asociado a este usuario
-        # buyer = Buyer.objects.get(user=user)
-        # return Cart.objects.filter(buyer=buyer)
+            # Usar el usuario autenticado si existe, sino usar usuario de prueba
+            if self.request.user.is_authenticated:
+                user = self.request.user
+                print(f"Using authenticated user: {user.username}")
+            else:
+                user = User.objects.first()  # Usar el primer usuario como prueba
+                print(f"Using first user for testing: {user.username if user else 'No users found'}")
+            
+            if user:
+                buyer, created = Buyer.objects.get_or_create(
+                    user=user,
+                    defaults={'usageProfile': 'General', 'preferences': []}
+                )
+                print(f"Buyer {'created' if created else 'found'}: {buyer}")
+                cart, created = Cart.objects.get_or_create(buyer=buyer)
+                print(f"Cart {'created' if created else 'found'}: {cart.id}")
+                queryset = Cart.objects.filter(buyer=buyer)
+                print(f"Queryset count: {queryset.count()}")
+                return queryset
+            
+            print("No user found")
+            return Cart.objects.none()
+        except Exception as e:
+            print(f"Error en get_queryset: {e}")
+            import traceback
+            traceback.print_exc()
+            return Cart.objects.none()
+
+    def list(self, request, *args, **kwargs):
+        """Override list to return array directly instead of paginated response"""
+        print(f"=== CART LIST METHOD ===")
+        queryset = self.get_queryset()
+        print(f"Queryset from get_queryset: {queryset.count()} items")
+        serializer = self.get_serializer(queryset, many=True)
+        print(f"Serialized data: {len(serializer.data)} items")
+        print(f"Serialized content: {serializer.data}")
+        return Response(serializer.data)
+
+    @action(detail=False, methods=['post'])
+    def add_item(self, request):
+        """Agregar un vehículo al carrito del usuario actual sin requerir pk del carrito."""
+        print(f"=== CART ADD ITEM ===")
+        print(f"User authenticated: {request.user.is_authenticated}")
+        print(f"User: {request.user}")
+        print(f"Request data: {request.data}")
+        
+        try:
+            # Determinar usuario (autenticado o primer usuario para pruebas)
+            if request.user.is_authenticated:
+                user = request.user
+                print(f"Using authenticated user: {user.username}")
+            else:
+                user = User.objects.first()
+                print(f"Using first user for testing: {user.username if user else 'No users found'}")
+
+            if not user:
+                print("ERROR: No hay usuarios en la base de datos")
+                return Response({'error': 'No hay usuario disponible para crear carrito. Por favor, crea una cuenta primero.'}, status=status.HTTP_400_BAD_REQUEST)
+
+            buyer, created_buyer = Buyer.objects.get_or_create(
+                user=user,
+                defaults={'usageProfile': 'General', 'preferences': []}
+            )
+            print(f"Buyer {'created' if created_buyer else 'found'}: {buyer}")
+            
+            cart, created_cart = Cart.objects.get_or_create(buyer=buyer)
+            print(f"Cart {'created' if created_cart else 'found'}: {cart}")
+
+            vehicle_id = request.data.get('vehicle_id')
+            if not vehicle_id:
+                return Response({'error': 'Vehicle ID is required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+            try:
+                vehicle = Vehicle.objects.get(id=vehicle_id)
+                print(f"Vehicle found: {vehicle}")
+            except Vehicle.DoesNotExist:
+                print(f"ERROR: Vehicle {vehicle_id} not found")
+                return Response({'error': 'Vehicle not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+            cart_item, created = CartItem.objects.get_or_create(cart=cart, vehicle=vehicle)
+            print(f"CartItem {'created' if created else 'found'}: {cart_item}")
+            
+            serializer = CartSerializer(cart)
+            print(f"=== CART ADD SUCCESS ===")
+            return Response(serializer.data, status=status.HTTP_201_CREATED if created else status.HTTP_200_OK)
+        except Exception as e:
+            print(f"ERROR in add_item: {str(e)}")
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     @action(detail=True, methods=['post'])
     def add_item(self, request, pk=None):

@@ -109,14 +109,7 @@
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
 }
 
-.step-active {
-  border-color: var(--accent-color);
-  background: linear-gradient(135deg, var(--card-bg) 0%, rgba(242, 68, 35, 0.05) 100%);
-}
-
-.step-active::before {
-  opacity: 1;
-}
+/* Removed .step-active styles - now all steps behave the same way */
 
 .step-number {
   font-size: 3rem;
