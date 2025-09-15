@@ -1,97 +1,136 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './VehicleDetails.css';
+import { getVehicle } from '../services/vehicleService';
 
 const VehicleDetails = ({ vehicleId, onBack }) => {
   const [activeTab, setActiveTab] = useState('overview');
+  const [vehicle, setVehicle] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Mock data - En una aplicación real, esto vendría de una API
-  const vehicle = {
-    id: vehicleId || 1,
-    images: [
-      'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=800&h=600&fit=crop',
-      'https://images.unsplash.com/photo-1549317331-15d33c1eef14?w=800&h=600&fit=crop',
-      'https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?w=800&h=600&fit=crop'
-    ],
-    brand: 'Toyota',
-    model: 'Corolla Hybrid',
-    year: 2023,
-    price: 85000000,
-    rating: 4.7,
-    location: 'Bogotá, Colombia',
-    isAvailable: true,
-    specifications: {
-      engine: '1.8L Híbrido',
-      power: '122 HP',
-      torque: '142 Nm',
-      transmission: 'CVT',
-      fuelType: 'Híbrido',
-      fuelConsumption: '4.1 L/100km',
-      acceleration: '10.9s 0-100 km/h',
-      topSpeed: '180 km/h',
-      seats: 5,
-      doors: 4,
-      cargo: '470 L',
-      drivetrain: 'FWD',
-      weight: '1,420 kg',
-      length: '4,630 mm',
-      width: '1,780 mm',
-      height: '1,435 mm'
-    },
-    expertRatings: {
-      overall: 4.7,
-      safety: 9.1,
-      comfort: 8.8,
-      technology: 9.5,
-      performance: 8.2,
-      reliability: 9.3,
-      value: 8.9
-    },
-    expertReviews: [
-      {
-        source: 'Motor1 Colombia',
-        rating: 4.5,
-        quote: 'El Corolla Hybrid ofrece una excelente combinación de eficiencia y confiabilidad, perfecto para el conductor urbano moderno.',
-        author: 'Carlos Mendoza',
-        date: '2023-10-15'
-      },
-      {
-        source: 'Auto Test Colombia',
-        rating: 4.8,
-        quote: 'Toyota ha logrado crear un híbrido que no compromete el rendimiento por la eficiencia. Una opción inteligente para Colombia.',
-        author: 'María González',
-        date: '2023-09-28'
+  useEffect(() => {
+    const loadVehicle = async () => {
+      if (!vehicleId) {
+        setError('ID de vehículo no proporcionado');
+        setLoading(false);
+        return;
       }
-    ],
-    idealFor: ['Ciudad', 'Viajes Largos', 'Familiar', 'Eficiencia'],
-    features: [
-      'Sistema de frenado regenerativo',
-      'Modo EV para conducción eléctrica',
-      'Sistema de infoentretenimiento Toyota Touch 2',
-      'Cámara de reversa',
-      'Sensores de estacionamiento',
-      'Control de crucero adaptativo',
-      'Asistente de mantenimiento de carril',
-      'Frenado automático de emergencia',
-      'Sistema de navegación GPS',
-      'Conectividad Bluetooth y USB'
-    ],
-    dealerships: [
-      {
-        name: 'Toyota Centro',
-        address: 'Carrera 7 #32-16, Bogotá',
-        phone: '(1) 234-5678',
-        distance: '2.3 km',
-        stock: 3
-      },
-      {
-        name: 'Toyota Norte',
-        address: 'Calle 127 #15-20, Bogotá',
-        phone: '(1) 345-6789',
-        distance: '5.7 km',
-        stock: 1
+
+      try {
+        setLoading(true);
+        const vehicleData = await getVehicle(vehicleId);
+        
+        // Transformar datos del backend al formato esperado
+        const transformedVehicle = {
+          id: vehicleData.id,
+          images: vehicleData.image ? [`http://localhost:8000${vehicleData.image}`] : ['/images/default-car.jpg'],
+          brand: vehicleData.make_name || vehicleData.make?.name || 'Sin marca',
+          model: vehicleData.model,
+          year: vehicleData.year,
+          price: parseFloat(vehicleData.price),
+          rating: 4.5, // Rating por defecto
+          location: 'Colombia',
+          isAvailable: true,
+          color: vehicleData.color,
+          category: vehicleData.category_name || vehicleData.category?.name || 'Sin categoría',
+          // Especificaciones por defecto (en el futuro se pueden obtener del backend)
+          specifications: {
+            engine: 'Motor estándar',
+            power: 'Potencia estándar',
+            torque: 'Torque estándar',
+            transmission: 'Automática',
+            fuelType: 'Gasolina',
+            fuelConsumption: 'Consumo estándar',
+            acceleration: 'Aceleración estándar',
+            topSpeed: 'Velocidad máxima estándar',
+            seats: 5,
+            doors: 4,
+            cargo: 'Maletero estándar',
+            drivetrain: 'Tracción estándar',
+            weight: 'Peso estándar',
+            length: 'Longitud estándar',
+            width: 'Ancho estándar',
+            height: 'Alto estándar'
+          },
+          expertRatings: {
+            overall: 4.5,
+            safety: 8.5,
+            comfort: 8.5,
+            technology: 8.5,
+            performance: 8.5,
+            reliability: 8.5,
+            value: 8.5
+          },
+          expertReviews: [
+            {
+              source: 'AutoMatch Review',
+              rating: 4.5,
+              quote: 'Un vehículo confiable con buenas características para el mercado colombiano.',
+              author: 'Equipo AutoMatch',
+              date: new Date().toISOString().split('T')[0]
+            }
+          ],
+          idealFor: ['Ciudad', 'Familiar', 'Confiabilidad'],
+          features: [
+            'Sistema de seguridad estándar',
+            'Conectividad básica',
+            'Comodidad para pasajeros',
+            'Eficiencia de combustible',
+            'Mantenimiento accesible'
+          ],
+          dealerships: [
+            {
+              name: 'Concesionario Principal',
+              address: 'Colombia',
+              phone: 'Contactar para más información',
+              distance: 'Consultar ubicación',
+              stock: 1
+            }
+          ]
+        };
+
+        setVehicle(transformedVehicle);
+      } catch (err) {
+        console.error('Error cargando vehículo:', err);
+        setError('Error al cargar los detalles del vehículo');
+      } finally {
+        setLoading(false);
       }
-    ]
-  };
+    };
+
+    loadVehicle();
+  }, [vehicleId]);
+
+  if (loading) {
+    return (
+      <div className="vehicle-details">
+        <div className="vehicle-details-container">
+          <div className="loading-spinner">
+            <div className="spinner"></div>
+            <p>Cargando detalles del vehículo...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !vehicle) {
+    return (
+      <div className="vehicle-details">
+        <div className="vehicle-details-container">
+          <div className="error-message">
+            <h2>Error</h2>
+            <p>{error || 'Vehículo no encontrado'}</p>
+            {onBack && (
+              <button className="btn-primary" onClick={onBack}>
+                Volver a la búsqueda
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const formatPrice = (price) => {
     return new Intl.NumberFormat('es-CO', {
@@ -198,11 +237,10 @@ const VehicleDetails = ({ vehicleId, onBack }) => {
             <div className="price-section">
               <div className="price-main">
                 <span className="price-value">{formatPrice(vehicle.price)}</span>
-                <span className="price-period">/mes</span>
               </div>
               <div className="price-details">
-                <span className="price-label">Precio de financiación</span>
-                <span className="price-note">*Con enganche del 30%</span>
+                <span className="price-label">Precio del vehículo</span>
+                <span className="price-note">*Precio de contado</span>
               </div>
             </div>
 

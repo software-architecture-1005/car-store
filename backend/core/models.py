@@ -60,7 +60,7 @@ class Vehicle(models.Model):
     color = models.CharField(max_length=50)
     price = models.DecimalField(max_digits=10, decimal_places=2)
 
-    seller = models.ForeignKey(Dealer, on_delete=models.CASCADE, related_name='vehicles_for_sale')
+    seller = models.ForeignKey(Dealer, on_delete=models.CASCADE, related_name='vehicles_for_sale', null=True, blank=True)
 
     make = models.ForeignKey(Make, on_delete=models.PROTECT, related_name='vehicles')
     category = models.ForeignKey(Category, on_delete=models.PROTECT, related_name='vehicles')

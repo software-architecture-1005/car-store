@@ -2,26 +2,24 @@ import React, { useState } from 'react';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import Differentiator from './components/Differentiator';
-// vbenitezz
-import VehicleForm from './components/VehicleForm';
-import VehicleList from './components/VehicleList';
-// vbenitezz
 import SearchResults from './pages/SearchResults';
 import VehicleDetails from './pages/VehicleDetails';
 import VehicleComparison from './pages/VehicleComparison';
 import Features from './pages/Features';
+import Signup from './pages/Signup';
+import Login from './pages/Login';
 import CartPage from './pages/CartPage';
+import Admin from './pages/Admin';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { ComparisonProvider } from './contexts/ComparisonContext';
 import './App.css';
-import SignupForm from "./components/SignupForm";
-import LoginForm from "./components/LoginForm";
 
-function App() {
+function AppContent() {
   const [currentPage, setCurrentPage] = useState('home');
   const [selectedVehicle, setSelectedVehicle] = useState(null);
-  const [refresh, setRefresh] = useState(false);
+  const { isAuthenticated, user } = useAuth();
 
-  const handleSearch = (searchData) => {
-    console.log('Searching for:', searchData);
+  const handleSearch = () => {
     setCurrentPage('search');
   };
 
@@ -52,23 +50,12 @@ function App() {
         return <VehicleComparison onBack={handleBackToHome} />;
       case 'features':
         return <Features />;
-      case 'registrar':
-        return (
-          <div className="registrar">
-              <VehicleForm vehicleCreated={() => setRefresh(!refresh)} />
-              {/* <VehicleList refresh={refresh} /> */}
-          </div>
-        );
-      case 'listar':
-        return (
-          <div className="listar">
-            <VehicleList />
-          </div>
-        );
       case 'signup':
-        return <SignupForm />;
+        return <Signup onNavigate={setCurrentPage} />;
       case 'login':
-        return <LoginForm />;
+        return <Login onNavigate={setCurrentPage} />;
+      case 'admin':
+        return <Admin />;
       case 'home':
       default:
         return (
@@ -82,12 +69,24 @@ function App() {
 
   return (
     <div className="App">
-      <Header 
+      <Header
         currentPage={currentPage}
         onNavigate={setCurrentPage}
+        isAuthenticated={isAuthenticated}
+        user={user}
       />
       {renderPage()}
     </div>
+  );
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      <ComparisonProvider>
+        <AppContent />
+      </ComparisonProvider>
+    </AuthProvider>
   );
 }
 

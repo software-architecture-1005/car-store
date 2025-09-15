@@ -23,7 +23,7 @@ class VehicleSerializer(serializers.ModelSerializer):
         category_name = serializers.CharField(source="category.name", read_only=True)
         class Meta:
                 model = Vehicle
-                fields = ['id', 'model', 'year', 'color', 'price', 'make', 'make_name', 'category', 'category_name']
+                fields = ['id', 'model', 'year', 'color', 'price', 'image', 'make', 'make_name', 'category', 'category_name']
                 
 class RoleSerializer(serializers.ModelSerializer):
         class Meta:

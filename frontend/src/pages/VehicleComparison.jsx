@@ -1,96 +1,61 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './VehicleComparison.css';
+import { useComparison } from '../contexts/ComparisonContext';
+import { getVehicles } from '../services/vehicleService';
 
 const VehicleComparison = () => {
-  const [comparisonVehicles, setComparisonVehicles] = useState([
-    {
-      id: 1,
-      image: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=300&h=200&fit=crop',
-      brand: 'Toyota',
-      model: 'Corolla Hybrid',
-      year: 2023,
-      price: 85000000,
-      rating: 4.7,
-      specifications: {
-        engine: '1.8L Híbrido',
-        power: '122 HP',
-        torque: '142 Nm',
-        transmission: 'CVT',
-        fuelType: 'Híbrido',
-        fuelConsumption: '4.1 L/100km',
-        acceleration: '10.9s 0-100 km/h',
-        topSpeed: '180 km/h',
-        seats: 5,
-        doors: 4,
-        cargo: '470 L',
-        drivetrain: 'FWD',
-        weight: '1,420 kg',
-        length: '4,630 mm',
-        width: '1,780 mm',
-        height: '1,435 mm'
-      },
-      expertRatings: {
-        safety: 9.1,
-        comfort: 8.8,
-        technology: 9.5,
-        performance: 8.2,
-        reliability: 9.3,
-        value: 8.9
-      },
-      features: [
-        'Sistema de frenado regenerativo',
-        'Modo EV para conducción eléctrica',
-        'Sistema de infoentretenimiento Toyota Touch 2',
-        'Cámara de reversa',
-        'Sensores de estacionamiento',
-        'Control de crucero adaptativo'
-      ]
-    },
-    {
-      id: 2,
-      image: 'https://images.unsplash.com/photo-1549317331-15d33c1eef14?w=300&h=200&fit=crop',
-      brand: 'Honda',
-      model: 'Civic',
-      year: 2023,
-      price: 92000000,
-      rating: 4.8,
-      specifications: {
-        engine: '1.5L Turbo',
-        power: '182 HP',
-        torque: '240 Nm',
-        transmission: 'CVT',
-        fuelType: 'Gasolina',
-        fuelConsumption: '6.2 L/100km',
-        acceleration: '8.1s 0-100 km/h',
-        topSpeed: '200 km/h',
-        seats: 5,
-        doors: 4,
-        cargo: '420 L',
-        drivetrain: 'FWD',
-        weight: '1,350 kg',
-        length: '4,675 mm',
-        width: '1,800 mm',
-        height: '1,415 mm'
-      },
-      expertRatings: {
-        safety: 9.3,
-        comfort: 9.1,
-        technology: 9.2,
-        performance: 9.5,
-        reliability: 9.0,
-        value: 8.7
-      },
-      features: [
-        'Motor turbo VTEC',
-        'Sistema de infoentretenimiento Honda Connect',
-        'Cámara de reversa con guías dinámicas',
-        'Sensores de estacionamiento delanteros y traseros',
-        'Control de crucero adaptativo',
-        'Asistente de mantenimiento de carril'
-      ]
-    },
-    null // Slot vacío para el tercer vehículo
-  ]);
+  const { comparisonVehicles, removeFromComparison, clearComparison, addToComparison, isInComparison, canAddMore } = useComparison();
+  const [allVehicles, setAllVehicles] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadVehicles = async () => {
+      try {
+        setLoading(true);
+        const data = await getVehicles();
+        const transformedVehicles = data.map(vehicle => ({
+          id: vehicle.id,
+          image: vehicle.image ? `http://localhost:8000${vehicle.image}` : '/images/default-car.jpg',
+          brand: vehicle.make_name || vehicle.make?.name || 'Sin marca',
+          model: vehicle.model,
+          year: vehicle.year,
+          price: parseFloat(vehicle.price),
+          color: vehicle.color,
+          category: vehicle.category_name || vehicle.category?.name || 'Sin categoría',
+          rating: 4.5,
+          specifications: {
+            engine: 'Motor estándar',
+            power: 'Potencia estándar',
+            transmission: 'Automática',
+            fuelType: 'Gasolina',
+            seats: 5,
+            doors: 4
+          },
+          expertRatings: { 
+            safety: 8.5, 
+            comfort: 8.5, 
+            technology: 8.5, 
+            performance: 8.5, 
+            reliability: 8.5, 
+            value: 8.5 
+          },
+          features: [
+            'Sistema de seguridad estándar',
+            'Conectividad básica',
+            'Comodidad para pasajeros',
+            'Eficiencia de combustible'
+          ]
+        }));
+        setAllVehicles(transformedVehicles);
+      } catch (error) {
+        console.error('Error cargando vehículos:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadVehicles();
+  }, []);
 
   const formatPrice = (price) => {
     return new Intl.NumberFormat('es-CO', {
@@ -122,27 +87,8 @@ const VehicleComparison = () => {
     return stars;
   };
 
-  const addVehicle = (vehicle) => {
-    const emptySlotIndex = comparisonVehicles.findIndex(v => v === null);
-    if (emptySlotIndex !== -1) {
-      const newVehicles = [...comparisonVehicles];
-      newVehicles[emptySlotIndex] = vehicle;
-      setComparisonVehicles(newVehicles);
-    }
-  };
-
-  const removeVehicle = (index) => {
-    const newVehicles = [...comparisonVehicles];
-    newVehicles[index] = null;
-    setComparisonVehicles(newVehicles);
-  };
-
-  const clearComparison = () => {
-    setComparisonVehicles([null, null, null]);
-  };
-
-  const activeVehicles = comparisonVehicles.filter(v => v !== null);
-  const hasEmptySlots = comparisonVehicles.some(v => v === null);
+  const activeVehicles = comparisonVehicles;
+  const hasEmptySlots = comparisonVehicles.length < 3;
 
   const comparisonSpecs = [
     { key: 'engine', label: 'Motor' },
@@ -200,55 +146,53 @@ const VehicleComparison = () => {
         {/* Vehicle Cards */}
         <div className="vehicles-row">
           {comparisonVehicles.map((vehicle, index) => (
-            <div key={index} className={`vehicle-column ${vehicle ? 'has-vehicle' : 'empty-slot'}`}>
-              {vehicle ? (
-                <>
-                  <div className="vehicle-card">
-                    <button 
-                      className="remove-vehicle"
-                      onClick={() => removeVehicle(index)}
-                    >
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
-                      </svg>
-                    </button>
-                    
-                    <div className="vehicle-image">
-                      <img src={vehicle.image} alt={`${vehicle.brand} ${vehicle.model}`} />
+            <div key={vehicle.id} className="vehicle-column has-vehicle">
+              <div className="vehicle-card">
+                <button 
+                  className="remove-vehicle"
+                  onClick={() => removeFromComparison(vehicle.id)}
+                >
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                  </svg>
+                </button>
+                
+                <div className="vehicle-image">
+                  <img src={vehicle.image} alt={`${vehicle.brand} ${vehicle.model}`} />
+                </div>
+                
+                <div className="vehicle-info">
+                  <h3 className="vehicle-name">
+                    {vehicle.year} {vehicle.brand} {vehicle.model}
+                  </h3>
+                  
+                  <div className="vehicle-rating">
+                    <div className="stars">
+                      {renderStars(vehicle.rating)}
                     </div>
-                    
-                    <div className="vehicle-info">
-                      <h3 className="vehicle-name">
-                        {vehicle.year} {vehicle.brand} {vehicle.model}
-                      </h3>
-                      
-                      <div className="vehicle-rating">
-                        <div className="stars">
-                          {renderStars(vehicle.rating)}
-                        </div>
-                        <span className="rating-value">{vehicle.rating}</span>
-                      </div>
-                      
-                      <div className="vehicle-price">
-                        <span className="price-value">{formatPrice(vehicle.price)}</span>
-                        <span className="price-period">/mes</span>
-                      </div>
-                    </div>
+                    <span className="rating-value">{vehicle.rating}</span>
                   </div>
-                </>
-              ) : (
-                <div className="empty-slot-card">
-                  <div className="empty-slot-content">
-                    <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
-                    </svg>
-                    <p>Agregar vehículo</p>
-                    <button className="btn-primary add-vehicle-btn">
-                      Buscar Vehículos
-                    </button>
+                  
+                  <div className="vehicle-price">
+                    <span className="price-value">{formatPrice(vehicle.price)}</span>
                   </div>
                 </div>
-              )}
+              </div>
+            </div>
+          ))}
+          
+          {/* Mostrar slots vacíos si hay menos de 3 vehículos */}
+          {Array.from({ length: 3 - comparisonVehicles.length }).map((_, index) => (
+            <div key={`empty-${index}`} className="vehicle-column empty-slot">
+              <div className="empty-slot-card">
+                <div className="empty-slot-content">
+                  <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                  </svg>
+                  <p>Agregar vehículo</p>
+                  <p className="empty-slot-hint">Ve al catálogo para agregar vehículos</p>
+                </div>
+              </div>
             </div>
           ))}
         </div>
@@ -275,7 +219,7 @@ const VehicleComparison = () => {
                       <div className="spec-label">{spec.label}</div>
                       {activeVehicles.map((vehicle, index) => (
                         <div key={index} className="spec-value">
-                          {vehicle.specifications[spec.key] || '-'}
+                          {vehicle.specifications?.[spec.key] || 'No disponible'}
                         </div>
                       ))}
                     </div>
@@ -297,11 +241,11 @@ const VehicleComparison = () => {
                           <div className="rating-bar">
                             <div 
                               className="rating-fill"
-                              style={{ width: `${(vehicle.expertRatings[rating.key] / 10) * 100}%` }}
+                              style={{ width: `${((vehicle.expertRatings?.[rating.key] || 8.5) / 10) * 100}%` }}
                             ></div>
                           </div>
                           <span className="rating-value">
-                            {vehicle.expertRatings[rating.key]}
+                            {vehicle.expertRatings?.[rating.key] || 8.5}
                           </span>
                         </div>
                       ))}
@@ -322,7 +266,7 @@ const VehicleComparison = () => {
                         {vehicle.year} {vehicle.brand} {vehicle.model}
                       </h4>
                       <ul className="features-list">
-                        {vehicle.features.map((feature, featureIndex) => (
+                        {(vehicle.features || []).map((feature, featureIndex) => (
                           <li key={featureIndex} className="feature-item">
                             <span className="feature-icon">✓</span>
                             {feature}
@@ -366,21 +310,59 @@ const VehicleComparison = () => {
           </div>
         )}
 
+        {/* Available Vehicles Section */}
+        {!loading && (
+          <div className="available-vehicles-section">
+            <h2 className="section-title">Vehículos Disponibles para Comparar</h2>
+            <div className="available-vehicles-grid">
+              {allVehicles.map(vehicle => (
+                <div key={vehicle.id} className="available-vehicle-card">
+                  <div className="vehicle-image">
+                    <img src={vehicle.image} alt={`${vehicle.brand} ${vehicle.model}`} />
+                  </div>
+                  <div className="vehicle-info">
+                    <h4>{vehicle.year} {vehicle.brand} {vehicle.model}</h4>
+                    <p className="vehicle-price">{formatPrice(vehicle.price)}</p>
+                    <p className="vehicle-category">{vehicle.category}</p>
+                    <button 
+                      className={`btn-primary add-to-comparison-btn ${isInComparison(vehicle.id) ? 'in-comparison' : ''}`}
+                      onClick={() => {
+                        if (isInComparison(vehicle.id)) {
+                          removeFromComparison(vehicle.id);
+                        } else if (canAddMore) {
+                          addToComparison(vehicle);
+                        }
+                      }}
+                      disabled={!isInComparison(vehicle.id) && !canAddMore}
+                    >
+                      {isInComparison(vehicle.id) ? 'En Comparación' : 'Agregar a Comparación'}
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Empty State */}
-        {activeVehicles.length === 0 && (
+        {activeVehicles.length === 0 && !loading && (
           <div className="empty-state">
             <div className="empty-state-content">
               <svg width="80" height="80" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M9 3H7c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h2c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 14H7V5h2v12zm8-14h-2c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h2c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 14h-2V5h2v12z"/>
               </svg>
               <h3>No hay vehículos para comparar</h3>
-              <p>Agrega vehículos desde la búsqueda para comenzar la comparación</p>
-              <button className="btn-primary">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
-                </svg>
-                Buscar Vehículos
-              </button>
+              <p>Selecciona vehículos de la lista de abajo para comenzar la comparación</p>
+            </div>
+          </div>
+        )}
+
+        {/* Loading State */}
+        {loading && (
+          <div className="loading-state">
+            <div className="loading-spinner">
+              <div className="spinner"></div>
+              <p>Cargando vehículos...</p>
             </div>
           </div>
         )}

@@ -1,7 +1,7 @@
 .vehicle-comparison {
   min-height: 100vh;
   background: var(--primary-bg);
-  padding-top: 80px;
+  padding-top: 60px;
 }
 
 .comparison-container {
@@ -534,7 +534,7 @@
 
 @media (max-width: 768px) {
   .vehicle-comparison {
-    padding-top: 70px;
+    padding-top: 50px;
   }
   
   .comparison-container {

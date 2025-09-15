@@ -1,7 +1,7 @@
 .vehicle-details {
   min-height: 100vh;
   background: var(--primary-bg);
-  padding-top: 80px;
+  padding-top: 60px;
 }
 
 .vehicle-details-container {
@@ -685,7 +685,7 @@
 
 @media (max-width: 768px) {
   .vehicle-details {
-    padding-top: 70px;
+    padding-top: 50px;
   }
   
   .vehicle-details-container {

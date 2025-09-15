@@ -4,6 +4,7 @@
 :root {
   /* Color Palette */
   --primary-bg: #1A1A1A;
+  --primary-bg-gradient: linear-gradient(135deg, #1A1A1A 0%, #2A2A2A 100%);
   --secondary-bg: #2A2A2A;
   --accent-color: #F24423;
   --accent-hover: #E03A1A;

@@ -14,3 +14,5 @@ Pillow==10.1.0
 # vbenitezz
 djangorestframework-simplejwt
 
+
+faker==25.9.1

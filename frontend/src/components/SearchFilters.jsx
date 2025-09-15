@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './SearchFilters.css';
 
-const SearchFilters = ({ onFilterChange, filters }) => {
+const SearchFilters = ({ onFilterChange, filters, makes = [], categories = [], onSearch }) => {
   const [isExpanded, setIsExpanded] = useState(true);
 
   const handleFilterChange = (filterType, value) => {
@@ -10,14 +10,28 @@ const SearchFilters = ({ onFilterChange, filters }) => {
 
   const clearFilters = () => {
     // Reset all filters
-    Object.keys(filters).forEach(key => {
-      onFilterChange(key, '');
+    const resetFilters = {
+      search: '',
+      priceMin: '',
+      priceMax: '',
+      brands: [],
+      yearFrom: '',
+      yearTo: '',
+      color: '',
+      category: ''
+    };
+    
+    Object.keys(resetFilters).forEach(key => {
+      onFilterChange(key, resetFilters[key]);
     });
   };
 
-  const activeFiltersCount = Object.values(filters).filter(value => 
-    value !== '' && value !== null && value !== undefined
-  ).length;
+  const activeFiltersCount = Object.values(filters).filter(value => {
+    if (Array.isArray(value)) {
+      return value.length > 0;
+    }
+    return value !== '' && value !== null && value !== undefined;
+  }).length;
 
   return (
     <div className={`search-filters ${isExpanded ? 'expanded' : 'collapsed'}`}>
@@ -53,22 +67,6 @@ const SearchFilters = ({ onFilterChange, filters }) => {
           />
         </div>
 
-        {/* Location */}
-        <div className="filter-group">
-          <label className="filter-label">Ubicación</label>
-          <select
-            className="filter-select"
-            value={filters.location || ''}
-            onChange={(e) => handleFilterChange('location', e.target.value)}
-          >
-            <option value="">Todas las ubicaciones</option>
-            <option value="bogota">Bogotá (156)</option>
-            <option value="medellin">Medellín (89)</option>
-            <option value="cali">Cali (67)</option>
-            <option value="barranquilla">Barranquilla (34)</option>
-            <option value="cartagena">Cartagena (23)</option>
-          </select>
-        </div>
 
         {/* Price Range */}
         <div className="filter-group">
@@ -96,100 +94,25 @@ const SearchFilters = ({ onFilterChange, filters }) => {
         <div className="filter-group">
           <label className="filter-label">Marca</label>
           <div className="checkbox-group">
-            {[
-              'Toyota', 'Honda', 'Nissan', 'Mazda', 'Hyundai', 'Kia', 
-              'Chevrolet', 'Ford', 'Renault', 'Volkswagen'
-            ].map(brand => (
-              <label key={brand} className="checkbox-item">
+            {makes.map(make => (
+              <label key={make.id} className="checkbox-item">
                 <input
                   type="checkbox"
-                  checked={filters.brands?.includes(brand) || false}
+                  checked={filters.brands?.includes(make.name) || false}
                   onChange={(e) => {
                     const currentBrands = filters.brands || [];
                     const newBrands = e.target.checked
-                      ? [...currentBrands, brand]
-                      : currentBrands.filter(b => b !== brand);
+                      ? [...currentBrands, make.name]
+                      : currentBrands.filter(b => b !== make.name);
                     handleFilterChange('brands', newBrands);
                   }}
                 />
-                <span className="checkbox-label">{brand}</span>
+                <span className="checkbox-label">{make.name}</span>
               </label>
             ))}
           </div>
         </div>
 
-        {/* Body Style */}
-        <div className="filter-group">
-          <label className="filter-label">Tipo de Vehículo</label>
-          <div className="icon-filter-group">
-            {[
-              { value: 'sedan', label: 'Sedán', icon: '🚗' },
-              { value: 'suv', label: 'SUV', icon: '🚙' },
-              { value: 'hatchback', label: 'Hatchback', icon: '🚐' },
-              { value: 'coupe', label: 'Coupé', icon: '🏎️' },
-              { value: 'pickup', label: 'Pickup', icon: '🛻' }
-            ].map(style => (
-              <button
-                key={style.value}
-                className={`icon-filter-btn ${filters.bodyStyle === style.value ? 'active' : ''}`}
-                onClick={() => handleFilterChange('bodyStyle', 
-                  filters.bodyStyle === style.value ? '' : style.value
-                )}
-              >
-                <span className="icon-filter-icon">{style.icon}</span>
-                <span className="icon-filter-label">{style.label}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Transmission */}
-        <div className="filter-group">
-          <label className="filter-label">Transmisión</label>
-          <div className="radio-group">
-            {[
-              { value: 'automatic', label: 'Automática' },
-              { value: 'manual', label: 'Manual' },
-              { value: 'cvt', label: 'CVT' }
-            ].map(transmission => (
-              <label key={transmission.value} className="radio-item">
-                <input
-                  type="radio"
-                  name="transmission"
-                  value={transmission.value}
-                  checked={filters.transmission === transmission.value}
-                  onChange={(e) => handleFilterChange('transmission', e.target.value)}
-                />
-                <span className="radio-label">{transmission.label}</span>
-              </label>
-            ))}
-          </div>
-        </div>
-
-        {/* Fuel Type */}
-        <div className="filter-group">
-          <label className="filter-label">Combustible</label>
-          <div className="checkbox-group">
-            {[
-              'Gasolina', 'Diésel', 'Híbrido', 'Eléctrico', 'Gas Natural'
-            ].map(fuel => (
-              <label key={fuel} className="checkbox-item">
-                <input
-                  type="checkbox"
-                  checked={filters.fuelTypes?.includes(fuel) || false}
-                  onChange={(e) => {
-                    const currentFuelTypes = filters.fuelTypes || [];
-                    const newFuelTypes = e.target.checked
-                      ? [...currentFuelTypes, fuel]
-                      : currentFuelTypes.filter(f => f !== fuel);
-                    handleFilterChange('fuelTypes', newFuelTypes);
-                  }}
-                />
-                <span className="checkbox-label">{fuel}</span>
-              </label>
-            ))}
-          </div>
-        </div>
 
         {/* Year Range */}
         <div className="filter-group">
@@ -216,31 +139,47 @@ const SearchFilters = ({ onFilterChange, filters }) => {
         {/* Color */}
         <div className="filter-group">
           <label className="filter-label">Color</label>
-          <div className="color-palette">
-            {[
-              { name: 'Blanco', value: 'white', color: '#FFFFFF' },
-              { name: 'Negro', value: 'black', color: '#000000' },
-              { name: 'Gris', value: 'gray', color: '#808080' },
-              { name: 'Rojo', value: 'red', color: '#FF0000' },
-              { name: 'Azul', value: 'blue', color: '#0000FF' },
-              { name: 'Verde', value: 'green', color: '#008000' },
-              { name: 'Plateado', value: 'silver', color: '#C0C0C0' }
-            ].map(color => (
-              <button
-                key={color.value}
-                className={`color-btn ${filters.colors?.includes(color.value) ? 'active' : ''}`}
-                style={{ backgroundColor: color.color }}
-                onClick={() => {
-                  const currentColors = filters.colors || [];
-                  const newColors = currentColors.includes(color.value)
-                    ? currentColors.filter(c => c !== color.value)
-                    : [...currentColors, color.value];
-                  handleFilterChange('colors', newColors);
-                }}
-                title={color.name}
-              />
+          <select
+            className="filter-select"
+            value={filters.color || ''}
+            onChange={(e) => handleFilterChange('color', e.target.value)}
+          >
+            <option value="">Todos los colores</option>
+            <option value="Blanco">Blanco</option>
+            <option value="Negro">Negro</option>
+            <option value="Gris">Gris</option>
+            <option value="Rojo">Rojo</option>
+            <option value="Azul">Azul</option>
+            <option value="Verde">Verde</option>
+            <option value="Plateado">Plateado</option>
+          </select>
+        </div>
+
+        {/* Category */}
+        <div className="filter-group">
+          <label className="filter-label">Categoría</label>
+          <select
+            className="filter-select"
+            value={filters.category || ''}
+            onChange={(e) => handleFilterChange('category', e.target.value)}
+          >
+            <option value="">Todas las categorías</option>
+            {categories.map(category => (
+              <option key={category.id} value={category.id}>
+                {category.name}
+              </option>
             ))}
-          </div>
+          </select>
+        </div>
+
+        {/* Botón de búsqueda */}
+        <div className="search-button-container">
+          <button 
+            className="search-button"
+            onClick={onSearch}
+          >
+            🔍 Buscar Vehículos
+          </button>
         </div>
       </div>
     </div>

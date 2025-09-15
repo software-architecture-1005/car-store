@@ -1,86 +1,130 @@
 import React, { useState, useEffect } from 'react';
-import { getCart, removeItemFromCart } from '../services/cartApi';
-import './CartPage.css'; // Crearemos este archivo para los estilos
+import { useAuth } from '../contexts/AuthContext';
+import axiosGlobalInstance from '../api/axiosGlobalInstance';
+import './CartPage.css';
 
-const CartPage = () => {
-  const [cart, setCart] = useState(null);
+const CartPage = ({ onViewDetails }) => {
+  const { isAuthenticated, user } = useAuth();
+  const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState('');
 
-  // useEffect para cargar los datos del carrito cuando el componente se monta
   useEffect(() => {
-    const fetchCartData = async () => {
-      try {
-        setLoading(true);
-        const cartData = await getCart();
-        setCart(cartData);
-        setError(null);
-      } catch (err) {
-        setError('No se pudo cargar el carrito. Por favor, inicia sesión.');
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
+    if (isAuthenticated) {
+      fetchCartItems();
+    } else {
+      setLoading(false);
+    }
+  }, [isAuthenticated]);
 
-    fetchCartData();
-  }, []); // El array vacío asegura que se ejecute solo una vez
-
-  // Función para manejar la eliminación de un item
-  const handleRemoveItem = async (itemId) => {
+  const fetchCartItems = async () => {
     try {
-      await removeItemFromCart(itemId);
-      // Actualizamos el estado local para reflejar el cambio sin recargar la página
-      setCart(prevCart => ({
-        ...prevCart,
-        // Filtramos el item eliminado de la lista
-        items: prevCart.items.filter(item => item.id !== itemId),
-        // Opcional: Re-calculamos el total localmente o esperamos la nueva info de la API
-      }));
-      // Idealmente, la API debería devolver el carrito actualizado para re-sincronizar el total
-      const updatedCart = await getCart();
-      setCart(updatedCart);
-
+      setLoading(true);
+      const response = await axiosGlobalInstance.get('/cart/');
+      if (response.data && response.data.length > 0) {
+        const cart = response.data[0];
+        setCartItems(cart.items || []);
+      }
     } catch (err) {
-      setError('Error al eliminar el artículo.');
+      setError('No se pudo cargar el carrito. Por favor, inicia sesión.');
+      console.error('Error fetching cart:', err);
+    } finally {
+      setLoading(false);
     }
   };
 
-  // --- Renderizado Condicional ---
+  const removeFromCart = async (itemId) => {
+    try {
+      await axiosGlobalInstance.delete(`/cart-items/${itemId}/`);
+      setCartItems(cartItems.filter(item => item.id !== itemId));
+    } catch (err) {
+      console.error('Error removing item:', err);
+    }
+  };
+
+  if (!isAuthenticated) {
+    return (
+      <div className="cart-page">
+        <div className="cart-container">
+          <h1>Carrito de Compras</h1>
+          <div className="error-message">
+            No se pudo cargar el carrito. Por favor, inicia sesión.
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (loading) {
-    return <p className="cart-message">Cargando tu carrito...</p>;
+    return (
+      <div className="cart-page">
+        <div className="cart-container">
+          <h1>Carrito de Compras</h1>
+          <div className="loading">Cargando carrito...</div>
+        </div>
+      </div>
+    );
   }
 
-  if (error) {
-    return <p className="cart-message error">{error}</p>;
-  }
-
-  if (!cart || cart.items.length === 0) {
-    return <p className="cart-message">Tu carrito está vacío.</p>;
-  }
-
-  // --- Renderizado Principal ---
   return (
-    <div className="cart-container">
-      <h2>🛒 Tu Carrito de Compras</h2>
-      <ul className="cart-items-list">
-        {cart.items.map((item) => (
-          <li key={item.id} className="cart-item">
-            <div className="item-info">
-              <span className="item-model">{item.vehicle.make.name} {item.vehicle.model}</span>
-              <span className="item-price">${new Intl.NumberFormat('es-CO').format(item.vehicle.price)}</span>
+    <div className="cart-page">
+      <div className="cart-container">
+        <h1>Carrito de Compras</h1>
+        
+        {error && (
+          <div className="error-message">
+            {error}
+          </div>
+        )}
+
+        {cartItems.length === 0 ? (
+          <div className="empty-cart">
+            <h2>Tu carrito está vacío</h2>
+            <p>Agrega algunos vehículos para comenzar tu compra.</p>
+          </div>
+        ) : (
+          <div className="cart-items">
+            {cartItems.map((item) => (
+              <div key={item.id} className="cart-item">
+                <div className="item-image">
+                  <img 
+                    src={item.vehicle.image || '/images/default-car.jpg'} 
+                    alt={item.vehicle.model}
+                  />
+                </div>
+                <div className="item-details">
+                  <h3>{item.vehicle.year} {item.vehicle.make.name} {item.vehicle.model}</h3>
+                  <p>Categoría: {item.vehicle.category.name}</p>
+                  <p>Color: {item.vehicle.color}</p>
+                  <p className="price">${item.vehicle.price.toLocaleString()}</p>
+                </div>
+                <div className="item-actions">
+                  <button 
+                    className="btn-secondary"
+                    onClick={() => onViewDetails && onViewDetails(item.vehicle)}
+                  >
+                    Ver Detalles
+                  </button>
+                  <button 
+                    className="btn-danger"
+                    onClick={() => removeFromCart(item.id)}
+                  >
+                    Eliminar
+                  </button>
+                </div>
+              </div>
+            ))}
+            
+            <div className="cart-summary">
+              <h3>Resumen</h3>
+              <p>Total de vehículos: {cartItems.length}</p>
+              <p>Precio total: ${cartItems.reduce((sum, item) => sum + item.vehicle.price, 0).toLocaleString()}</p>
+              <button className="btn-primary btn-checkout">
+                Proceder al Pago
+              </button>
             </div>
-            <button 
-              onClick={() => handleRemoveItem(item.id)} 
-              className="remove-button"
-            >
-              Eliminar
-            </button>
-          </li>
-        ))}
-      </ul>
-      <div className="cart-summary">
-        <h3>Total: ${new Intl.NumberFormat('es-CO').format(cart.total_price)}</h3>
+          </div>
+        )}
       </div>
     </div>
   );

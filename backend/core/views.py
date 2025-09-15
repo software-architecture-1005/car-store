@@ -79,15 +79,86 @@ class VehicleViewSet(viewsets.ModelViewSet):
             return Response(serializer.data)
         return Response([])
     
-    # Acción avanzada: búsqueda compleja (USANDO TU SERVICIO)
+    # Acción avanzada: búsqueda inteligente (USANDO TU SERVICIO)
     @action(detail=False, methods=['get'])
     def search(self, request):
-        # Aquí es donde usamos tu VehicleSearch service
+        # Debug: imprimir parámetros recibidos
+        print("=== BÚSQUEDA INTELIGENTE ===")
+        print("Parámetros recibidos:", dict(request.GET))
+        print("QueryDict completo:", request.GET)
+        print("Brands específicamente:", request.GET.getlist('brands'))
+        
+        # Verificar si hay algún parámetro de búsqueda
+        has_params = any([
+            request.GET.get('search'),
+            request.GET.get('price_min'),
+            request.GET.get('price_max'),
+            request.GET.get('year_from'),
+            request.GET.get('year_to'),
+            request.GET.getlist('brands'),
+        ])
+        
+        print(f"¿Hay parámetros de búsqueda? {has_params}")
+        
+        # Usar el servicio de búsqueda inteligente
         search_service = VehicleSearch(request.GET)
         vehicles = search_service.execute()
         
+        print(f"Vehículos encontrados: {vehicles.count()}")
+        print("Primeros 3 vehículos:")
+        for v in vehicles[:3]:
+            print(f"  - {v.year} {v.make.name} {v.model}")
+        print("=== FIN BÚSQUEDA ===")
+        
         serializer = self.get_serializer(vehicles, many=True)
         return Response(serializer.data)
+    
+    # Acción para obtener sugerencias de búsqueda
+    @action(detail=False, methods=['get'])
+    def suggestions(self, request):
+        """Obtener sugerencias para autocompletado"""
+        query = request.GET.get('q', '').strip()
+        suggestions = []
+        
+        if len(query) >= 2:
+            # Buscar en modelos
+            models = Vehicle.objects.filter(
+                model__icontains=query
+            ).values_list('model', flat=True).distinct()[:5]
+            
+            # Buscar en marcas
+            makes = Make.objects.filter(
+                name__icontains=query
+            ).values_list('name', flat=True).distinct()[:5]
+            
+            # Buscar en categorías
+            categories = Category.objects.filter(
+                name__icontains=query
+            ).values_list('name', flat=True).distinct()[:5]
+            
+            suggestions = {
+                'models': list(models),
+                'makes': list(makes),
+                'categories': list(categories)
+            }
+        
+        return Response(suggestions)
+    
+    # Acción para debug - verificar datos
+    @action(detail=False, methods=['get'])
+    def debug(self, request):
+        """Endpoint para debug - verificar qué datos tenemos"""
+        debug_info = {
+            'total_vehicles': Vehicle.objects.count(),
+            'total_makes': Make.objects.count(),
+            'total_categories': Category.objects.count(),
+            'makes': list(Make.objects.values('id', 'name')),
+            'categories': list(Category.objects.values('id', 'name')),
+            'vehicles_sample': list(Vehicle.objects.select_related('make', 'category').values(
+                'id', 'model', 'make__name', 'category__name', 'year', 'price'
+            )[:5])
+        }
+        return Response(debug_info)
     
 class ReviewViewSet(viewsets.ModelViewSet):
     queryset = Review.objects.all()
@@ -122,15 +193,24 @@ class CartViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         # Cada usuario solo puede ver su propio carrito
         try:
-            user = User.objects.get(id=1) # <-- O el ID del usuario de prueba que quieras usar
-            buyer = Buyer.objects.get(user=user)
-            return Cart.objects.filter(buyer=buyer)
-        except User.DoesNotExist:
-            return Cart.objects.none() # Devuelve un queryset vacío si el usuario de prueba no existe
-        # user = self.request.user
-        # # Buscamos el perfil de comprador asociado a este usuario
-        # buyer = Buyer.objects.get(user=user)
-        # return Cart.objects.filter(buyer=buyer)
+            # Usar el usuario autenticado si existe, sino usar usuario de prueba
+            if self.request.user.is_authenticated:
+                user = self.request.user
+            else:
+                user = User.objects.first()  # Usar el primer usuario como prueba
+            
+            if user:
+                buyer, created = Buyer.objects.get_or_create(
+                    user=user,
+                    defaults={'usageProfile': 'General', 'preferences': []}
+                )
+                cart, created = Cart.objects.get_or_create(buyer=buyer)
+                return Cart.objects.filter(buyer=buyer)
+            
+            return Cart.objects.none()
+        except Exception as e:
+            print(f"Error en get_queryset: {e}")
+            return Cart.objects.none()
 
     @action(detail=True, methods=['post'])
     def add_item(self, request, pk=None):

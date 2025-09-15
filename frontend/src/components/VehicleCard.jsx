@@ -1,5 +1,6 @@
 import React from 'react';
 import './VehicleCard.css';
+import { useComparison } from '../contexts/ComparisonContext';
 
 const VehicleCard = ({ vehicle, onViewDetails, onCompare }) => {
   const {
@@ -9,12 +10,38 @@ const VehicleCard = ({ vehicle, onViewDetails, onCompare }) => {
     model,
     year,
     price,
+    color,
+    category,
     rating,
     specifications,
     location,
     isAvailable,
     isPromoted
   } = vehicle;
+
+  // Verificar que el contexto esté disponible
+  let comparisonContext;
+  try {
+    comparisonContext = useComparison();
+  } catch (error) {
+    console.warn('ComparisonContext no disponible:', error);
+    comparisonContext = {
+      addToComparison: () => {},
+      removeFromComparison: () => {},
+      isInComparison: () => false,
+      canAddMore: true
+    };
+  }
+
+  const { addToComparison, removeFromComparison, isInComparison, canAddMore } = comparisonContext;
+  
+  const handleCompare = () => {
+    if (isInComparison(id)) {
+      removeFromComparison(id);
+    } else if (canAddMore) {
+      addToComparison(vehicle);
+    }
+  };
 
   const formatPrice = (price) => {
     return new Intl.NumberFormat('es-CO', {
@@ -79,13 +106,14 @@ const VehicleCard = ({ vehicle, onViewDetails, onCompare }) => {
             Ver Detalles
           </button>
           <button 
-            className="overlay-btn compare-btn"
-            onClick={() => onCompare(id)}
+            className={`overlay-btn compare-btn ${isInComparison(id) ? 'in-comparison' : ''}`}
+            onClick={handleCompare}
+            disabled={!isInComparison(id) && !canAddMore}
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
               <path d="M9 3H7c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h2c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 14H7V5h2v12zm8-14h-2c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h2c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 14h-2V5h2v12z"/>
             </svg>
-            Comparar
+            {isInComparison(id) ? 'Quitar' : 'Comparar'}
           </button>
         </div>
       </div>
@@ -112,6 +140,17 @@ const VehicleCard = ({ vehicle, onViewDetails, onCompare }) => {
           ))}
         </div>
 
+        <div className="vehicle-details">
+          <div className="detail-item">
+            <span className="detail-label">Color:</span>
+            <span className="detail-value">{color}</span>
+          </div>
+          <div className="detail-item">
+            <span className="detail-label">Categoría:</span>
+            <span className="detail-value">{category}</span>
+          </div>
+        </div>
+
         <div className="vehicle-location">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
             <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
@@ -121,9 +160,8 @@ const VehicleCard = ({ vehicle, onViewDetails, onCompare }) => {
 
         <div className="card-footer">
           <div className="price-container">
-            <span className="price-label">Desde</span>
+            <span className="price-label">Precio</span>
             <span className="price-value">{formatPrice(price)}</span>
-            <span className="price-period">/mes</span>
           </div>
           
           <div className="availability">
