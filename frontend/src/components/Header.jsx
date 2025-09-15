@@ -1,7 +1,11 @@
 import React from 'react';
 import './Header.css';
+import logoImage from '../assets/Logo-automatch-sin-fondo.png';
+import { useAuth } from '../contexts/AuthContext';
 
 const Header = ({ currentPage, onNavigate }) => {
+  const { isAuthenticated, user, logout } = useAuth();
+  
   const handleNavigation = (page) => {
     if (onNavigate) {
       onNavigate(page);
@@ -17,7 +21,11 @@ const Header = ({ currentPage, onNavigate }) => {
           onClick={() => handleNavigation('home')}
           style={{ cursor: 'pointer' }}
         >
-          <div className="logo-icon">A</div>
+          <img 
+            src={logoImage} 
+            alt="AutoMatch Logo" 
+            className="logo-image"
+          />
           <span className="logo-text">AutoMatch</span>
         </div>
 
@@ -34,7 +42,7 @@ const Header = ({ currentPage, onNavigate }) => {
             className={`nav-link ${currentPage === 'search' ? 'active' : ''}`}
             onClick={() => handleNavigation('search')}
           >
-            Vehículos
+            Catálogo
           </button>
 
           <button 
@@ -44,7 +52,7 @@ const Header = ({ currentPage, onNavigate }) => {
             Comparar
           </button>
           <button 
-            className="nav-link"
+            className={`nav-link ${currentPage === 'features' ? 'active' : ''}`}
             onClick={() => handleNavigation('features')}
           >
             Características
@@ -53,26 +61,44 @@ const Header = ({ currentPage, onNavigate }) => {
             className="nav-link"
             onClick={() => handleNavigation('cart')}
           >
-            Cart
+            Carrito
           </button>
 
-          <button className={`nav-link ${currentPage === 'registrar' ? 'active' : ''}`} onClick={() => handleNavigation('registrar')}>Registrar</button>
+          {isAuthenticated ? (
+            <>
+              <button 
+                className={`nav-link ${currentPage === 'admin' ? 'active' : ''}`} 
+                onClick={() => handleNavigation('admin')}
+              >
+                Admin
+              </button>
+              <button 
+                className="nav-link" 
+                onClick={() => {
+                  logout();
+                  handleNavigation('home');
+                }}
+              >
+                Cerrar Sesión
+              </button>
+            </>
+          ) : (
+            <>
+              <button 
+                className={`nav-link ${currentPage === 'signup' ? 'active' : ''}`} 
+                onClick={() => handleNavigation('signup')}
+              >
+                Registrarse
+              </button>
 
-          <button className={`nav-link ${currentPage === 'listar' ? 'active' : ''}`} onClick={() => handleNavigation('listar')}>Listar</button>
-
-          <button 
-            className={`nav-link ${currentPage === 'signup' ? 'active' : ''}`} 
-            onClick={() => handleNavigation('signup')}
-          >
-            Registrarse
-          </button>
-
-          <button
-            className={`nav-link ${currentPage === 'login' ? 'active' : ''}`} 
-            onClick={() => handleNavigation('login')}
-          >
-            Iniciar Sesión
-          </button>
+              <button
+                className={`nav-link ${currentPage === 'login' ? 'active' : ''}`} 
+                onClick={() => handleNavigation('login')}
+              >
+                Iniciar Sesión
+              </button>
+            </>
+          )}
         </nav>
 
       </div>

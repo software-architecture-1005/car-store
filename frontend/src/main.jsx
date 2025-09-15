@@ -6,7 +6,6 @@ import App from './App.jsx'
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-import './styles/global.css'; // Tus estilos globales deben ir después
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

@@ -14,16 +14,22 @@ class CategorySerializer(serializers.ModelSerializer):
                 fields = '__all__'
 
 class SimpleVehicleSerializer(serializers.ModelSerializer):
+    make_name = serializers.CharField(source='make.name', read_only=True)
+    category_name = serializers.CharField(source='category.name', read_only=True)
+    price = serializers.DecimalField(max_digits=10, decimal_places=2, coerce_to_string=False)
+    
     class Meta:
         model = Vehicle
-        fields = ['id', 'make', 'model', 'price']
+        fields = ['id', 'model', 'year', 'color', 'price', 'image', 'make', 'make_name', 'category', 'category_name']
                 
 class VehicleSerializer(serializers.ModelSerializer):
         make_name = serializers.CharField(source='make.name', read_only=True)
         category_name = serializers.CharField(source="category.name", read_only=True)
+        price = serializers.DecimalField(max_digits=10, decimal_places=2, coerce_to_string=False)
+        
         class Meta:
                 model = Vehicle
-                fields = ['id', 'model', 'year', 'color', 'price', 'make', 'make_name', 'category', 'category_name']
+                fields = ['id', 'model', 'year', 'color', 'price', 'image', 'make', 'make_name', 'category', 'category_name']
                 
 class RoleSerializer(serializers.ModelSerializer):
         class Meta:
@@ -99,5 +105,5 @@ class CartSerializer(serializers.ModelSerializer):
 
     def get_total_price(self, cart_obj):
         items_with_vehicles = cart_obj.items.select_related('vehicle')
-        total = sum(item.vehicle.price * item.quantity for item in items_with_vehicles)
+        total = sum(float(item.vehicle.price) * item.quantity for item in items_with_vehicles)
         return total

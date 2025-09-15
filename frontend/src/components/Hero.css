@@ -1,6 +1,7 @@
 .hero {
   position: relative;
   min-height: 100vh;
+  padding-top: 60px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -221,7 +222,7 @@
 @media (max-width: 768px) {
   .hero {
     min-height: 90vh;
-    padding-top: 80px;
+    padding-top: 50px;
   }
   
   .hero-container {
