@@ -11,6 +11,23 @@ from .serializer import (
 )
 from .models import Make, Category, Vehicle, User, Role, Buyer, Expert, Review
 
+from rest_framework import status
+from rest_framework.views import APIView
+from django.contrib.auth import get_user_model
+from rest_framework.permissions import AllowAny
+
+User = get_user_model()
+
+class SignupView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        serializer = UserSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
+            return Response({"message": "User created successfully"}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 class MakeViewSet(viewsets.ModelViewSet):
     queryset = Make.objects.all()
     serializer_class = MakeSerializer

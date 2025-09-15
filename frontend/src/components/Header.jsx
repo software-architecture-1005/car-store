@@ -53,6 +53,20 @@ const Header = ({ currentPage, onNavigate }) => {
           <button className={`nav-link ${currentPage === 'registrar' ? 'active' : ''}`} onClick={() => handleNavigation('registrar')}>Registrar</button>
 
           <button className={`nav-link ${currentPage === 'listar' ? 'active' : ''}`} onClick={() => handleNavigation('listar')}>Listar</button>
+
+          <button 
+            className={`nav-link ${currentPage === 'signup' ? 'active' : ''}`} 
+            onClick={() => handleNavigation('signup')}
+          >
+            Registrarse
+          </button>
+
+          <button
+            className={`nav-link ${currentPage === 'login' ? 'active' : ''}`} 
+            onClick={() => handleNavigation('login')}
+          >
+            Iniciar Sesión
+          </button>
         </nav>
 
       </div>

@@ -22,6 +22,7 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('car-store/', include('core.urls')),
+
     
     # Documentación de la API
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),

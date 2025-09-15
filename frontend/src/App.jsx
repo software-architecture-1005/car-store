@@ -11,6 +11,8 @@ import VehicleDetails from './pages/VehicleDetails';
 import VehicleComparison from './pages/VehicleComparison';
 import Features from './pages/Features';
 import './App.css';
+import SignupForm from "./components/SignupForm";
+import LoginForm from "./components/LoginForm";
 
 function App() {
   const [currentPage, setCurrentPage] = useState('home');
@@ -60,6 +62,10 @@ function App() {
             <VehicleList />
           </div>
         );
+      case 'signup':
+        return <SignupForm />;
+      case 'login':
+        return <LoginForm />;
       case 'home':
       default:
         return (
