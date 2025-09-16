@@ -15,7 +15,7 @@ const VehicleComparison = () => {
         const data = await getVehicles();
         const transformedVehicles = data.map(vehicle => ({
           id: vehicle.id,
-          image: vehicle.image ? `http://localhost:8000${vehicle.image}` : '/images/default-car.jpg',
+          image: vehicle.image_url || (vehicle.image ? `http://localhost:8000${vehicle.image}` : '/images/default-car.jpg'),
           brand: vehicle.make_name || vehicle.make?.name || 'Sin marca',
           model: vehicle.model,
           year: vehicle.year,

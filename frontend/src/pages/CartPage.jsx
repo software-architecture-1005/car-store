@@ -107,7 +107,7 @@ const CartPage = ({ onViewDetails }) => {
               <div key={item.id} className="cart-item">
                 <div className="item-image">
                   <img 
-                    src={item.vehicle.image || '/images/default-car.jpg'} 
+                    src={(item.vehicle.image_url) || (item.vehicle.image ? `http://localhost:8000${item.vehicle.image}` : '/images/default-car.jpg')} 
                     alt={item.vehicle.model}
                   />
                 </div>

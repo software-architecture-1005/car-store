@@ -28,7 +28,7 @@ const VehicleDetails = ({ vehicleId, onBack }) => {
         // Transformar datos del backend al formato esperado
         const transformedVehicle = {
           id: vehicleData.id,
-          images: vehicleData.image ? [`http://localhost:8000${vehicleData.image}`] : ['/images/default-car.jpg'],
+          images: [vehicleData.image_url || (vehicleData.image ? `http://localhost:8000${vehicleData.image}` : '/images/default-car.jpg')],
           brand: vehicleData.make_name || vehicleData.make?.name || 'Sin marca',
           model: vehicleData.model,
           year: vehicleData.year,
