@@ -5,7 +5,6 @@ venv/
 # Archivos de caché y de compilación de Django
 __pycache__/
 *.pyc
-media/
 
 # Archivos de configuración de Django
 local_settings.py
