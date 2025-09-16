@@ -59,6 +59,11 @@ class VehicleViewSet(viewsets.ModelViewSet):
     queryset = Vehicle.objects.all()
     serializer_class = VehicleSerializer
     
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['request'] = self.request
+        return context
+    
     # Acción básica: filtrar por marca (sin servicio)
     @action(detail=False, methods=['get'])
     def by_make(self, request):

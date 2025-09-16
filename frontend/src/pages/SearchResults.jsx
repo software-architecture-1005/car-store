@@ -95,7 +95,7 @@ const SearchResults = ({ onViewDetails, initialFilters }) => {
         // Transformar datos del backend al formato esperado por el frontend
         const transformedVehicles = vehiclesData.map(vehicle => ({
           id: vehicle.id,
-          image: vehicle.image ? `http://localhost:8000${vehicle.image}` : '/images/default-car.jpg',
+          image: vehicle.image_url || (vehicle.image ? `http://localhost:8000${vehicle.image}` : '/images/default-car.jpg'),
           brand: vehicle.make_name || vehicle.make?.name || 'Sin marca',
           model: vehicle.model,
           year: vehicle.year,
@@ -226,7 +226,7 @@ const SearchResults = ({ onViewDetails, initialFilters }) => {
         // Adaptar resultados a la tarjeta
         const adapted = results.map(vehicle => ({
         id: vehicle.id,
-        image: vehicle.image ? `http://localhost:8000${vehicle.image}` : '/images/default-car.jpg',
+        image: vehicle.image_url || (vehicle.image ? `http://localhost:8000${vehicle.image}` : '/images/default-car.jpg'),
         brand: vehicle.make_name || vehicle.make?.name || 'Sin marca',
         model: vehicle.model,
         year: vehicle.year,

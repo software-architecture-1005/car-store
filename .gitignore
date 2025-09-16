@@ -2,9 +2,6 @@
 venv/
 .env
 
-# Archivos de la base de datos de Django
-*.sqlite3
-
 # Archivos de caché y de compilación de Django
 __pycache__/
 *.pyc

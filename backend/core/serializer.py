@@ -17,19 +17,41 @@ class SimpleVehicleSerializer(serializers.ModelSerializer):
     make_name = serializers.CharField(source='make.name', read_only=True)
     category_name = serializers.CharField(source='category.name', read_only=True)
     price = serializers.DecimalField(max_digits=10, decimal_places=2, coerce_to_string=False)
+    image_url = serializers.SerializerMethodField()
     
     class Meta:
         model = Vehicle
-        fields = ['id', 'model', 'year', 'color', 'price', 'image', 'make', 'make_name', 'category', 'category_name']
+        fields = ['id', 'model', 'year', 'color', 'price', 'image', 'image_url', 'make', 'make_name', 'category', 'category_name']
+    
+    def get_image_url(self, obj):
+        if obj.image:
+            request = self.context.get('request')
+            try:
+                url = obj.image.url
+            except Exception:
+                return None
+            return request.build_absolute_uri(url) if request else url
+        return None
                 
 class VehicleSerializer(serializers.ModelSerializer):
         make_name = serializers.CharField(source='make.name', read_only=True)
         category_name = serializers.CharField(source="category.name", read_only=True)
         price = serializers.DecimalField(max_digits=10, decimal_places=2, coerce_to_string=False)
+        image_url = serializers.SerializerMethodField()
         
         class Meta:
                 model = Vehicle
-                fields = ['id', 'model', 'year', 'color', 'price', 'image', 'make', 'make_name', 'category', 'category_name']
+                fields = ['id', 'model', 'year', 'color', 'price', 'image', 'image_url', 'make', 'make_name', 'category', 'category_name']
+        
+        def get_image_url(self, obj):
+            if obj.image:
+                request = self.context.get('request')
+                try:
+                    url = obj.image.url
+                except Exception:
+                    return None
+                return request.build_absolute_uri(url) if request else url
+            return None
                 
 class RoleSerializer(serializers.ModelSerializer):
         class Meta:
