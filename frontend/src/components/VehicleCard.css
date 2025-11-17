@@ -5,7 +5,6 @@
   overflow: hidden;
   transition: all 0.3s ease;
   position: relative;
-  height: 100%;
   display: flex;
   flex-direction: column;
 }
@@ -110,11 +109,10 @@
 }
 
 .card-content {
-  padding: 12px;
-  flex: 1;
+  padding: 16px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
 }
 
 .card-header {
@@ -197,11 +195,12 @@
 .vehicle-details {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  padding: 8px;
+  gap: 2px;
+  padding: 6px 8px;
   background: var(--secondary-bg);
   border-radius: 6px;
   border: 1px solid var(--border-color);
+  margin-top: 8px;
 }
 
 .detail-item {
@@ -237,8 +236,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: auto;
-  padding-top: 16px;
+  margin-top: 8px;
+  padding-top: 12px;
   border-top: 1px solid var(--border-color);
 }
 

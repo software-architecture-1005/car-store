@@ -11,8 +11,21 @@ django-cors-headers==4.3.1
 # Utilidades adicionales
 Pillow==10.1.0
 
-# vbenitezz
+# JWT Authentication
 djangorestframework-simplejwt
 
-
+# Testing y datos de prueba
 faker==25.9.1
+
+# Entregable #2 - Nuevas dependencias
+# Generación de reportes PDF
+reportlab==4.0.7
+
+# Generación de reportes Excel
+openpyxl==3.1.2
+
+# Consumo de APIs externas
+requests==2.31.0
+
+# Internacionalización (ya incluido en Django, pero agregamos django-rosetta para gestión)
+django-rosetta==0.10.0
