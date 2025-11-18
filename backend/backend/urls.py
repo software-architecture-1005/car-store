@@ -22,7 +22,9 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('car-store/', include('core.urls')),
-
+    
+    # Rosetta - Editor de traducciones (solo en desarrollo)
+    path('rosetta/', include('rosetta.urls')),
     
     # Documentación de la API
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),

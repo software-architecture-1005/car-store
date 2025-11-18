@@ -19,6 +19,7 @@ router.register(r'buyers', views.BuyerViewSet, 'buyers')
 router.register(r'experts', views.ExpertViewSet, 'experts')
 router.register(r'reviews', views.ReviewViewSet, 'reviews')
 router.register(r'cart', views.CartViewSet, 'cart')
+router.register(r'language', views.LanguageViewSet, 'language')  # i18n endpoints
 
 urlpatterns = [
     # Versionado de la api

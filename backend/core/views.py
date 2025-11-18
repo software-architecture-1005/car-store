@@ -6,6 +6,9 @@ from .services import VehicleSearch
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.permissions import AllowAny
 from rest_framework import status
+# Importar funciones de traducción para i18n
+from django.utils.translation import gettext as _
+from django.utils.translation import get_language, activate
 # Esto de abajo es para importar los datos serializados y mostrarlos en la vista
 from .serializer import (
     MakeSerializer, CategorySerializer, VehicleSerializer, 
@@ -325,3 +328,51 @@ class CartViewSet(viewsets.ModelViewSet):
             return Response({'error': 'Item not found in your cart.'}, status=status.HTTP_404_NOT_FOUND)
         
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+# ViewSet para demostrar internacionalización
+class LanguageViewSet(viewsets.ViewSet):
+    """
+    ViewSet para cambiar idioma y obtener mensajes traducidos.
+    Demuestra el uso de i18n en Django.
+    """
+    permission_classes = [AllowAny]
+    
+    @action(detail=False, methods=['get'])
+    def welcome(self, request):
+        """
+        Endpoint de ejemplo que retorna un mensaje de bienvenida traducido.
+        Usa el idioma detectado automáticamente por LocaleMiddleware.
+        """
+        current_language = get_language()
+        message = _("Welcome to Car Store")
+        
+        return Response({
+            'message': message,
+            'language': current_language
+        })
+    
+    @action(detail=False, methods=['post'])
+    def set_language(self, request):
+        """
+        Cambia el idioma de la sesión.
+        Parámetros: language (es o en)
+        """
+        language_code = request.data.get('language', 'es')
+        
+        if language_code not in ['es', 'en']:
+            return Response(
+                {'error': _("Language not supported")},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Activar el idioma
+        activate(language_code)
+        
+        # Guardar en la sesión para futuras requests
+        request.session['django_language'] = language_code
+        
+        return Response({
+            'message': _("Language changed successfully"),
+            'language': language_code
+        })

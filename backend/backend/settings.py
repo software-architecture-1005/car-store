@@ -40,12 +40,14 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework',
     'drf_spectacular',
+    'rosetta',  # Para gestionar traducciones desde el admin
     'core'
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',  # Para detectar idioma del usuario
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -108,15 +110,29 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+# Idioma por defecto (español)
+LANGUAGE_CODE = 'es'
+
+# Idiomas soportados
+from django.utils.translation import gettext_lazy as _
+
+LANGUAGES = [
+    ('es', _('Spanish')),
+    ('en', _('English')),
+]
+
+# Ruta donde Django buscará los archivos de traducción
+LOCALE_PATHS = [
+    BASE_DIR / 'locale',
+]
 
 TIME_ZONE = 'UTC'
 
-USE_I18N = True
+USE_I18N = True  # Habilita el sistema de internacionalización
 
-USE_L10N = True
+USE_L10N = True  # Habilita formato localizado de fechas, números, etc.
 
-USE_TZ = True
+USE_TZ = True  # Usa zonas horarias
 
 
 # Static files (CSS, JavaScript, Images)
