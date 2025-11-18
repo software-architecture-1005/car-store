@@ -343,13 +343,36 @@ class LanguageViewSet(viewsets.ViewSet):
         """
         Endpoint de ejemplo que retorna un mensaje de bienvenida traducido.
         Usa el idioma detectado automáticamente por LocaleMiddleware.
+        
+        El idioma se detecta en este orden:
+        1. Header Accept-Language
+        2. Cookie django_language
+        3. Sesión django_language
+        4. LANGUAGE_CODE en settings (por defecto: es)
         """
         current_language = get_language()
+        
+        # Debug: ver de dónde viene el idioma
+        accept_language = request.headers.get('Accept-Language', 'Not set')
+        cookie_language = request.COOKIES.get('django_language', 'Not set')
+        session_language = request.session.get('django_language', 'Not set')
+        
+        print(f"=== LANGUAGE DEBUG ===")
+        print(f"Current language: {current_language}")
+        print(f"Accept-Language header: {accept_language}")
+        print(f"Cookie django_language: {cookie_language}")
+        print(f"Session django_language: {session_language}")
+        
         message = _("Welcome to Car Store")
         
         return Response({
             'message': message,
-            'language': current_language
+            'language': current_language,
+            'debug': {
+                'accept_language_header': accept_language,
+                'cookie': cookie_language,
+                'session': session_language
+            }
         })
     
     @action(detail=False, methods=['post'])
@@ -357,6 +380,9 @@ class LanguageViewSet(viewsets.ViewSet):
         """
         Cambia el idioma de la sesión.
         Parámetros: language (es o en)
+        
+        Para usar el idioma en futuras requests, incluye el header:
+        Accept-Language: es (o en)
         """
         language_code = request.data.get('language', 'es')
         
@@ -366,13 +392,26 @@ class LanguageViewSet(viewsets.ViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
         
-        # Activar el idioma
+        # Activar el idioma para esta request
         activate(language_code)
         
         # Guardar en la sesión para futuras requests
         request.session['django_language'] = language_code
         
-        return Response({
+        # Crear respuesta con el mensaje traducido
+        response = Response({
             'message': _("Language changed successfully"),
-            'language': language_code
+            'language': language_code,
+            'instructions': 'Para futuras requests, usa el header Accept-Language: ' + language_code
         })
+        
+        # Establecer cookie de idioma (alternativa a sesión)
+        response.set_cookie(
+            key='django_language',
+            value=language_code,
+            max_age=365 * 24 * 60 * 60,  # 1 año
+            httponly=False,
+            samesite='Lax'
+        )
+        
+        return response
