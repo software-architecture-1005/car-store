@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import './Auth.css';
-import { signup, login } from '../services/authService';
-import { useAuth } from '../contexts/AuthContext';
+import '../Auth.css';
+import { signup, login } from '../../../services/authService';
+import { useAuth } from '../../../contexts/AuthContext';
 
 const Signup = ({ onNavigate }) => {
   const { t } = useTranslation();
