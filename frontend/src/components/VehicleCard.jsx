@@ -96,7 +96,10 @@ const VehicleCard = ({ vehicle, onViewDetails, onCompare }) => {
   };
 
   return (
-    <div className={`vehicle-card hover-lift ${isPromoted ? 'promoted' : ''}`}>
+    <div 
+      className={`custom-vehicle-card hover-lift ${isPromoted ? 'promoted' : ''}`}
+      style={{ height: 'auto', minHeight: 0 }}
+    >
       {isPromoted && (
         <div className="promotion-badge">
           <span className="promotion-icon">⭐</span>
@@ -155,14 +158,14 @@ const VehicleCard = ({ vehicle, onViewDetails, onCompare }) => {
           ))}
         </div>
 
-        <div className="vehicle-details">
-          <div className="detail-item">
-            <span className="detail-label">{t('vehicle.color')}:</span>
-            <span className="detail-value">{translateColor(color, t)}</span>
+        <div className="vehicle-info-compact">
+          <div className="info-row">
+            <span className="info-label">{t('vehicle.color')}:</span>
+            <span className="info-value">{translateColor(color, t)}</span>
           </div>
-          <div className="detail-item">
-            <span className="detail-label">{t('vehicle.category')}:</span>
-            <span className="detail-value">{category}</span>
+          <div className="info-row">
+            <span className="info-label">{t('vehicle.category')}:</span>
+            <span className="info-value">{category}</span>
           </div>
         </div>
 

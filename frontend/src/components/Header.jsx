@@ -64,7 +64,7 @@ const Header = ({ currentPage, onNavigate }) => {
             {t('nav.features')}
           </button>
           <button 
-            className="nav-link"
+            className={`nav-link ${currentPage === 'cart' ? 'active' : ''}`}
             onClick={() => handleNavigation('cart')}
           >
             {t('nav.cart')}
@@ -105,25 +105,25 @@ const Header = ({ currentPage, onNavigate }) => {
               </button>
             </>
           )}
-
-          {/* Language Selector */}
-          <div style={{ marginLeft: '20px', display: 'flex', gap: '5px' }}>
-            <button 
-              className={`nav-link ${i18n.language === 'es' ? 'active' : ''}`}
-              onClick={() => changeLanguage('es')}
-              style={{ padding: '5px 10px', fontSize: '0.9em' }}
-            >
-              ES
-            </button>
-            <button 
-              className={`nav-link ${i18n.language === 'en' ? 'active' : ''}`}
-              onClick={() => changeLanguage('en')}
-              style={{ padding: '5px 10px', fontSize: '0.9em' }}
-            >
-              EN
-            </button>
-          </div>
         </nav>
+
+        {/* Language Selector */}
+        <div className="language-selector">
+          <button 
+            className={`nav-link ${i18n.language === 'es' ? 'active' : ''}`}
+            onClick={() => changeLanguage('es')}
+            style={{ padding: '5px 10px', fontSize: '0.9em' }}
+          >
+            ES
+          </button>
+          <button 
+            className={`nav-link ${i18n.language === 'en' ? 'active' : ''}`}
+            onClick={() => changeLanguage('en')}
+            style={{ padding: '5px 10px', fontSize: '0.9em' }}
+          >
+            EN
+          </button>
+        </div>
 
       </div>
     </header>
