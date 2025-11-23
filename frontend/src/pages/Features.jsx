@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useCurrency } from '../contexts/CurrencyContext';
 import VehicleAnalysis from '../components/VehicleAnalysis';
 import { getVehicles } from '../services/vehicleService';
 import './Features.css';
 
 const Features = () => {
   const { t } = useTranslation();
+  const { formatPrice } = useCurrency();
   const [vehicles, setVehicles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedVehicle, setSelectedVehicle] = useState(null);
@@ -18,7 +20,7 @@ const Features = () => {
         const transformedVehicles = data.map(vehicle => ({
           id: vehicle.id,
           image: vehicle.image_url || (vehicle.image ? `http://localhost:8000${vehicle.image}` : '/images/default-car.jpg'),
-          brand: vehicle.make_name || vehicle.make?.name || t('vehicle.noMake'),
+          brand: vehicle.make_name || vehicle.make?.name || t('vehicle.noBrand'),
           model: vehicle.model,
           year: vehicle.year,
           price: parseFloat(vehicle.price),
@@ -54,14 +56,6 @@ const Features = () => {
     loadVehicles();
   }, []);
 
-  const formatPrice = (price) => {
-    return new Intl.NumberFormat('es-CO', {
-      style: 'currency',
-      currency: 'COP',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0
-    }).format(price);
-  };
 
   if (loading) {
     return (

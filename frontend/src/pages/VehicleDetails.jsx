@@ -4,9 +4,11 @@ import './VehicleDetails.css';
 import { getVehicle } from '../services/vehicleService';
 import { addVehicleToCart } from '../services/cartService';
 import { translateColor, translateSpec, translateFeature, translateTag } from '../i18n/translateVehicleData';
+import { useCurrency } from '../contexts/CurrencyContext';
 
 const VehicleDetails = ({ vehicleId, onBack }) => {
   const { t } = useTranslation();
+  const { formatPrice } = useCurrency();
   console.log('VehicleDetails component rendering with vehicleId:', vehicleId);
   const [activeTab, setActiveTab] = useState('overview');
   const [vehicle, setVehicle] = useState(null);
@@ -32,7 +34,7 @@ const VehicleDetails = ({ vehicleId, onBack }) => {
         const transformedVehicle = {
           id: vehicleData.id,
           images: [vehicleData.image_url || (vehicleData.image ? `http://localhost:8000${vehicleData.image}` : '/images/default-car.jpg')],
-          brand: vehicleData.make_name || vehicleData.make?.name || t('vehicle.noMake'),
+          brand: vehicleData.make_name || vehicleData.make?.name || t('vehicle.noBrand'),
           model: vehicleData.model,
           year: vehicleData.year,
           price: parseFloat(vehicleData.price),
@@ -140,14 +142,6 @@ const VehicleDetails = ({ vehicleId, onBack }) => {
     );
   }
 
-  const formatPrice = (price) => {
-    return new Intl.NumberFormat('es-CO', {
-      style: 'currency',
-      currency: 'COP',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0
-    }).format(price);
-  };
 
   const renderStars = (rating) => {
     const stars = [];

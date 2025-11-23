@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
+import { useCurrency } from '../contexts/CurrencyContext';
 import axiosGlobalInstance from '../api/axiosGlobalInstance';
 import { translateColor } from '../i18n/translateVehicleData';
 import './CartPage.css';
 
 const CartPage = ({ onViewDetails }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const { formatPrice } = useCurrency();
   console.log('CartPage component rendering');
   const { isAuthenticated, user } = useAuth();
   const [cartItems, setCartItems] = useState([]);
@@ -22,6 +24,11 @@ const CartPage = ({ onViewDetails }) => {
       setLoading(false);
     }
   }, [isAuthenticated]);
+
+  // Forzar re-render cuando cambia el idioma
+  useEffect(() => {
+    // Este efecto asegura que el componente se actualice cuando cambia el idioma
+  }, [i18n.language]);
 
   const fetchCartItems = async () => {
     try {
@@ -118,7 +125,7 @@ const CartPage = ({ onViewDetails }) => {
                   <h3>{item.vehicle.year} {item.vehicle.make.name} {item.vehicle.model}</h3>
                   <p>{t('vehicle.category')}: {item.vehicle.category.name}</p>
                   <p>{t('vehicle.color')}: {translateColor(item.vehicle.color, t)}</p>
-                  <p className="price">${item.vehicle.price.toLocaleString()}</p>
+                  <p className="price">{formatPrice(item.vehicle.price)}</p>
                 </div>
                 <div className="item-actions">
                   <button 
@@ -139,8 +146,8 @@ const CartPage = ({ onViewDetails }) => {
             
             <div className="cart-summary">
               <h3>{t('cart.title')}</h3>
-              <p>{t('search.resultsCount', { count: cartItems.length })}</p>
-              <p>{t('cart.total')}: ${cartItems.reduce((sum, item) => sum + item.vehicle.price, 0).toLocaleString()}</p>
+              <p>{t('cart.itemsCount', { count: cartItems.length })}</p>
+              <p>{t('cart.total')}: {formatPrice(cartItems.reduce((sum, item) => sum + item.vehicle.price, 0))}</p>
               <button className="btn-primary btn-checkout">
                 {t('cart.checkout')}
               </button>

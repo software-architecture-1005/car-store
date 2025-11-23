@@ -103,9 +103,16 @@
   width: 100%;
 }
 
-.language-selector {
+.header-controls {
   position: absolute;
   right: 20px;
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.language-selector {
   display: flex;
   gap: 5px;
   align-items: center;
@@ -177,8 +184,13 @@
     left: 16px;
   }
   
-  .language-selector {
+  .header-controls {
     right: 16px;
+    gap: 8px;
+  }
+  
+  .language-selector {
+    right: auto;
   }
   
   .nav {

@@ -2,10 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import './VehicleComparison.css';
 import { useComparison } from '../contexts/ComparisonContext';
+import { useCurrency } from '../contexts/CurrencyContext';
 import { getVehicles } from '../services/vehicleService';
 
 const VehicleComparison = () => {
   const { t } = useTranslation();
+  const { formatPrice } = useCurrency();
   const { comparisonVehicles, removeFromComparison, clearComparison, addToComparison, isInComparison, canAddMore } = useComparison();
   const [allVehicles, setAllVehicles] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -18,7 +20,7 @@ const VehicleComparison = () => {
         const transformedVehicles = data.map(vehicle => ({
           id: vehicle.id,
           image: vehicle.image_url || (vehicle.image ? `http://localhost:8000${vehicle.image}` : '/images/default-car.jpg'),
-          brand: vehicle.make_name || vehicle.make?.name || t('vehicle.noMake'),
+          brand: vehicle.make_name || vehicle.make?.name || t('vehicle.noBrand'),
           model: vehicle.model,
           year: vehicle.year,
           price: parseFloat(vehicle.price),
@@ -59,14 +61,6 @@ const VehicleComparison = () => {
     loadVehicles();
   }, []);
 
-  const formatPrice = (price) => {
-    return new Intl.NumberFormat('es-CO', {
-      style: 'currency',
-      currency: 'COP',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0
-    }).format(price);
-  };
 
   const translateSpecValue = (value, specKey, t) => {
     if (typeof value !== 'string') return value;

@@ -92,3 +92,45 @@ class VehicleAvailabilityTests(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
         self.assertEqual(response.data[0]['id'], self.vehicle_available.id)
+
+from unittest.mock import patch, Mock
+from .services.exchange_rate_service import ExchangeRateService
+
+class ExchangeRateServiceTests(TestCase):
+    @patch('core.services.exchange_rate_service.requests.get')
+    def test_get_exchange_rates_success(self, mock_get):
+        # Configurar el mock
+        mock_response = Mock()
+        expected_data = {'base': 'USD', 'rates': {'EUR': 0.85, 'COP': 4000}}
+        mock_response.json.return_value = expected_data
+        mock_response.status_code = 200
+        mock_get.return_value = mock_response
+
+        # Llamar al servicio
+        rates = ExchangeRateService.get_exchange_rates('USD')
+
+        # Verificar resultados
+        self.assertEqual(rates, expected_data)
+        mock_get.assert_called_once()
+
+    @patch('core.services.exchange_rate_service.requests.get')
+    def test_get_exchange_rates_cache(self, mock_get):
+        # Limpiar caché
+        from django.core.cache import cache
+        cache.clear()
+
+        # Configurar mock
+        mock_response = Mock()
+        expected_data = {'base': 'USD', 'rates': {'EUR': 0.85}}
+        mock_response.json.return_value = expected_data
+        mock_response.status_code = 200
+        mock_get.return_value = mock_response
+
+        # Primera llamada (debe ir a la API)
+        ExchangeRateService.get_exchange_rates('USD')
+        mock_get.assert_called_once()
+
+        # Segunda llamada (debe ir al caché)
+        ExchangeRateService.get_exchange_rates('USD')
+        # El número de llamadas no debe aumentar
+        mock_get.assert_called_once()

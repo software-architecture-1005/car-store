@@ -429,3 +429,80 @@ class LanguageViewSet(viewsets.ViewSet):
         )
         
         return response
+
+class ExchangeRateViewSet(viewsets.ViewSet):
+    """
+    ViewSet para obtener tasas de cambio actuales y convertir precios.
+    Endpoints:
+    - GET /api/v1/exchange-rates/ - Obtener tasas de cambio
+    - POST /api/v1/exchange-rates/convert/ - Convertir precio entre monedas
+    """
+    permission_classes = [AllowAny]
+
+    def list(self, request):
+        """
+        Obtiene las tasas de cambio para una moneda base.
+        Query params:
+        - base: Código de moneda base (default: 'USD')
+        """
+        import importlib.util
+        import os
+        # Importar desde el directorio services/ evitando conflicto con services.py
+        services_dir = os.path.join(os.path.dirname(__file__), 'services')
+        exchange_rate_path = os.path.join(services_dir, 'exchange_rate_service.py')
+        spec = importlib.util.spec_from_file_location("exchange_rate_service", exchange_rate_path)
+        exchange_rate_module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(exchange_rate_module)
+        ExchangeRateService = exchange_rate_module.ExchangeRateService
+        
+        base_currency = request.query_params.get('base', 'USD')
+        rates = ExchangeRateService.get_exchange_rates(base_currency)
+        
+        if "error" in rates:
+            return Response(rates, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+            
+        return Response(rates)
+
+    @action(detail=False, methods=['post'])
+    def convert(self, request):
+        """
+        Convierte un precio de una moneda a otra.
+        Body params:
+        - amount: Cantidad a convertir (float)
+        - from_currency: Moneda origen (string, ej: 'COP')
+        - to_currency: Moneda destino (string, ej: 'USD', 'EUR')
+        """
+        import importlib.util
+        import os
+        # Importar desde el directorio services/ evitando conflicto con services.py
+        services_dir = os.path.join(os.path.dirname(__file__), 'services')
+        exchange_rate_path = os.path.join(services_dir, 'exchange_rate_service.py')
+        spec = importlib.util.spec_from_file_location("exchange_rate_service", exchange_rate_path)
+        exchange_rate_module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(exchange_rate_module)
+        ExchangeRateService = exchange_rate_module.ExchangeRateService
+        
+        amount = request.data.get('amount')
+        from_currency = request.data.get('from_currency', 'COP')
+        to_currency = request.data.get('to_currency', 'USD')
+        
+        if amount is None:
+            return Response(
+                {"error": "Missing required parameter", "details": "amount is required"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        try:
+            amount = float(amount)
+        except (ValueError, TypeError):
+            return Response(
+                {"error": "Invalid amount", "details": "amount must be a valid number"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        result = ExchangeRateService.convert_price(amount, from_currency, to_currency)
+        
+        if "error" in result:
+            return Response(result, status=status.HTTP_400_BAD_REQUEST)
+        
+        return Response(result)

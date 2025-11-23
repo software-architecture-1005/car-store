@@ -98,7 +98,7 @@ const SearchResults = ({ onViewDetails, initialFilters }) => {
         const transformedVehicles = vehiclesData.map(vehicle => ({
           id: vehicle.id,
           image: vehicle.image_url || (vehicle.image ? `http://localhost:8000${vehicle.image}` : '/images/default-car.jpg'),
-          brand: vehicle.make_name || vehicle.make?.name || t('vehicle.noMake'),
+          brand: vehicle.make_name || vehicle.make?.name || t('vehicle.noBrand'),
           model: vehicle.model,
           year: vehicle.year,
           price: parseFloat(vehicle.price),

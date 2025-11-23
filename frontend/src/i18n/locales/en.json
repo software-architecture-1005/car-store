@@ -108,6 +108,7 @@
   },
   "vehicle": {
     "make": "Make",
+    "brand": "Brand",
     "model": "Model",
     "year": "Year",
     "price": "Price",
@@ -131,6 +132,7 @@
     "compare": "Compare",
     "promoted": "Featured",
     "noMake": "No make",
+    "noBrand": "No brand",
     "noCategory": "No category"
   },
   "cart": {
@@ -141,7 +143,10 @@
     "remove": "Remove",
     "continueShopping": "Continue shopping",
     "itemAdded": "Item added to cart",
-    "itemRemoved": "Item removed from cart"
+    "itemRemoved": "Item removed from cart",
+    "itemsCount": "{{count}} item(s) in cart",
+    "itemsCount_one": "1 item in cart",
+    "itemsCount_other": "{{count}} items in cart"
   },
   "auth": {
     "login": "Login",
@@ -179,9 +184,25 @@
     "vehicles": "Vehicle Management",
     "users": "User Management",
     "addVehicle": "Add Vehicle",
+    "manageVehicles": "Manage Vehicles",
+    "addNewVehicle": "Add New Vehicle",
+    "registeredVehicles": "Registered Vehicles",
     "editVehicle": "Edit Vehicle",
     "deleteVehicle": "Delete Vehicle",
-    "confirmDelete": "Are you sure you want to delete this vehicle?"
+    "confirmDelete": "Are you sure you want to delete this vehicle?",
+    "registerVehicle": "Register Vehicle",
+    "register": "Register",
+    "model": "Model",
+    "year": "Year",
+    "color": "Color",
+    "price": "Price",
+    "selectMake": "Select Make",
+    "selectBrand": "Select Brand",
+    "selectCategory": "Select Category",
+    "selectFile": "Add Image",
+    "allFieldsRequired": "All fields are required",
+    "loadingVehicles": "Loading vehicles...",
+    "noVehiclesFound": "No vehicles found."
   },
   "comparison": {
     "title": "Vehicle Comparison",
@@ -471,5 +492,16 @@
     "contactForInfo": "Contact for more information",
     "mainDealer": "Main Dealer",
     "country": "Colombia"
+  },
+  "currency": {
+    "title": "Prices in multiple currencies",
+    "loading": "Loading exchange rates...",
+    "error": "Error loading exchange rates",
+    "lastUpdate": "Last update",
+    "basePrice": "Base price",
+    "usd": "US Dollar (USD)",
+    "eur": "Euro (EUR)",
+    "cop": "Colombian Peso (COP)",
+    "selectCurrency": "Currency"
   }
 }

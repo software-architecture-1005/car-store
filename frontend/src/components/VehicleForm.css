@@ -69,3 +69,45 @@
   background-color: #e64a19; /* naranja oscuro al pasar el mouse */
   transform: translateY(-2px);
 }
+
+/* File input personalizado */
+.file-input-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.file-input-hidden {
+  position: absolute;
+  width: 0.1px;
+  height: 0.1px;
+  opacity: 0;
+  overflow: hidden;
+  z-index: -1;
+}
+
+.file-input-label {
+  display: block;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #333333;
+  border-radius: 8px;
+  background-color: #2b2b2b;
+  color: #ffffff;
+  font-size: 1rem;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s ease-in-out;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.file-input-label:hover {
+  border-color: #ff5722;
+  background-color: #333333;
+}
+
+.file-input-label:focus-within {
+  border-color: #ff5722;
+  box-shadow: 0 0 0 2px rgba(255, 87, 34, 0.3);
+}
