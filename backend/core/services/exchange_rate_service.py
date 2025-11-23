@@ -5,10 +5,6 @@ from datetime import datetime
 from typing import Dict, Optional
 
 class ExchangeRateService:
-    """
-    Servicio para obtener tasas de cambio desde ExchangeRate-API.
-    Implementa caché de 24 horas y manejo robusto de errores.
-    """
     API_URL = "https://api.exchangerate-api.com/v4/latest/"
     CACHE_TIMEOUT = 86400  # 24 horas en segundos
     CACHE_KEY_PREFIX = "exchange_rates_"
