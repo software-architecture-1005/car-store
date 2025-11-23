@@ -12,6 +12,7 @@ import CartPage from './pages/CartPage/CartPage';
 import Admin from './pages/Admin/Admin';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { ComparisonProvider } from './contexts/ComparisonContext';
+import { ServicesProvider } from './contexts/ServicesContext';
 import './App.css';
 
 function AppContent() {
@@ -83,11 +84,13 @@ function AppContent() {
 
 function App() {
   return (
-    <AuthProvider>
-      <ComparisonProvider>
-        <AppContent />
-      </ComparisonProvider>
-    </AuthProvider>
+    <ServicesProvider>
+      <AuthProvider>
+        <ComparisonProvider>
+          <AppContent />
+        </ComparisonProvider>
+      </AuthProvider>
+    </ServicesProvider>
   );
 }
 
