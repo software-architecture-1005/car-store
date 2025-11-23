@@ -2,16 +2,17 @@ import React, { useState } from 'react';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import Differentiator from './components/Differentiator';
-import SearchResults from './pages/SearchResults';
-import VehicleDetails from './pages/VehicleDetails';
-import VehicleComparison from './pages/VehicleComparison';
-import Features from './pages/Features';
-import Signup from './pages/Signup';
-import Login from './pages/Login';
-import CartPage from './pages/CartPage';
-import Admin from './pages/Admin';
+import SearchResults from './pages/SearchResults/SearchResults';
+import VehicleDetails from './pages/VehicleDetails/VehicleDetails';
+import VehicleComparison from './pages/VehicleComparison/VehicleComparison';
+import Features from './pages/Features/Features';
+import Signup from './pages/AuthPages/Signup/Signup';
+import Login from './pages/AuthPages/Login/Login';
+import CartPage from './pages/CartPage/CartPage';
+import Admin from './pages/Admin/Admin';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { ComparisonProvider } from './contexts/ComparisonContext';
+import { ServicesProvider } from './contexts/ServicesContext';
 import { CurrencyProvider } from './contexts/CurrencyContext';
 import './App.css';
 
@@ -84,13 +85,15 @@ function AppContent() {
 
 function App() {
   return (
-    <AuthProvider>
-      <CurrencyProvider>
-        <ComparisonProvider>
-          <AppContent />
-        </ComparisonProvider>
-      </CurrencyProvider>
-    </AuthProvider>
+    <ServicesProvider>
+      <AuthProvider>
+        <CurrencyProvider>
+          <ComparisonProvider>
+            <AppContent />
+          </ComparisonProvider>
+        </CurrencyProvider>
+      </AuthProvider>
+    </ServicesProvider>
   );
 }
 

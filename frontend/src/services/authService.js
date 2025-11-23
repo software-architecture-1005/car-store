@@ -1,9 +1,7 @@
 import axios from '../api/axiosGlobalInstance';
 
-const BASE_AUTH = 'http://localhost:8000/car-store/';
-
 export async function login({ username, password }) {
-  const url = `${BASE_AUTH}api/token/`;
+  const url = `token/`; // URL relativa a la baseURL de axiosGlobalInstance (ya incluye /api/v1/)
   const { data } = await axios.post(url, { username, password });
   localStorage.setItem('accessToken', data.access);
   localStorage.setItem('refreshToken', data.refresh);
@@ -13,14 +11,14 @@ export async function login({ username, password }) {
 export async function refreshToken() {
   const refresh = localStorage.getItem('refreshToken');
   if (!refresh) return null;
-  const url = `${BASE_AUTH}api/token/refresh/`;
+  const url = `token/refresh/`;
   const { data } = await axios.post(url, { refresh });
   localStorage.setItem('accessToken', data.access);
   return data;
 }
 
 export async function signup({ username, email, password }) {
-  const url = `${BASE_AUTH}api/signup/`;
+  const url = `signup/`;
   const { data } = await axios.post(url, { username, email, password });
   return data;
 }

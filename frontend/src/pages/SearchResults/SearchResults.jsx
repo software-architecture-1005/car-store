@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import SearchFilters from '../components/SearchFilters';
-import VehicleCard from '../components/VehicleCard';
-import { getVehicles, searchVehicles } from '../services/vehicleService';
-import { getMakes } from '../services/makeService';
-import { getCategories } from '../services/categoryService';
+import SearchFilters from '../../components/SearchFilters';
+import VehicleCard from '../../components/VehicleCard';
+import { getVehicles, searchVehicles } from '../../services/vehicleService';
+import { getMakes } from '../../services/makeService';
+import { getCategories } from '../../services/categoryService';
 import './SearchResults.css';
 
 const SearchResults = ({ onViewDetails, initialFilters }) => {
@@ -94,6 +94,24 @@ const SearchResults = ({ onViewDetails, initialFilters }) => {
           getCategories()
         ]);
         
+        console.log('=== DATOS RECIBIDOS DEL BACKEND ===');
+        console.log('vehiclesData tipo:', typeof vehiclesData, 'es array?', Array.isArray(vehiclesData));
+        console.log('vehiclesData:', vehiclesData);
+        console.log('vehiclesData.length:', vehiclesData?.length);
+        console.log('makesData:', makesData);
+        console.log('categoriesData:', categoriesData);
+        
+        // Validar que vehiclesData sea un array
+        if (!Array.isArray(vehiclesData)) {
+          console.error('❌ ERROR: vehiclesData no es un array:', vehiclesData);
+          console.error('Tipo recibido:', typeof vehiclesData);
+          throw new Error(`Formato de datos inválido del backend. Tipo recibido: ${typeof vehiclesData}`);
+        }
+        
+        if (vehiclesData.length === 0) {
+          console.warn('⚠️ ADVERTENCIA: El backend devolvió un array vacío');
+        }
+        
         // Transformar datos del backend al formato esperado por el frontend
         const transformedVehicles = vehiclesData.map(vehicle => ({
           id: vehicle.id,
@@ -131,7 +149,16 @@ const SearchResults = ({ onViewDetails, initialFilters }) => {
         });
         console.log('Primeros 3 vehículos:', transformedVehicles.slice(0, 3));
       } catch (error) {
-        console.error('Error cargando datos iniciales:', error);
+        console.error('❌ ERROR cargando datos iniciales:', error);
+        console.error('Error completo:', {
+          message: error.message,
+          response: error.response,
+          data: error.response?.data,
+          status: error.response?.status,
+          config: error.config
+        });
+        // No establecer arrays vacíos inmediatamente, mantener el estado anterior
+        // para que el usuario vea que hubo un error
         setVehicles([]);
         setFilteredVehicles([]);
         setSortedVehicles([]);
@@ -229,7 +256,7 @@ const SearchResults = ({ onViewDetails, initialFilters }) => {
         const adapted = results.map(vehicle => ({
         id: vehicle.id,
         image: vehicle.image_url || (vehicle.image ? `http://localhost:8000${vehicle.image}` : '/images/default-car.jpg'),
-        brand: vehicle.make_name || vehicle.make?.name || t('vehicle.noMake'),
+        brand: vehicle.make_name || vehicle.make?.name || t('vehicle.noBrand'),
         model: vehicle.model,
         year: vehicle.year,
         price: parseFloat(vehicle.price),

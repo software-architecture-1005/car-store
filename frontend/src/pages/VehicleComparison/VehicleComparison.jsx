@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import './VehicleComparison.css';
-import { useComparison } from '../contexts/ComparisonContext';
-import { useCurrency } from '../contexts/CurrencyContext';
-import { getVehicles } from '../services/vehicleService';
+import { useComparison } from '../../contexts/ComparisonContext';
+import { useCurrency } from '../../contexts/CurrencyContext';
+import { getVehicles } from '../../services/vehicleService';
 
 const VehicleComparison = () => {
   const { t } = useTranslation();

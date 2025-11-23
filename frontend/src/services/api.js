@@ -1,25 +1,25 @@
-import api from '../api/axiosInstance'
+import axios from '../api/axiosGlobalInstance'
 
 // Signup
 export const signup = async (userData) => {
-  const response = await api.post("/api/signup/", userData);
+  const response = await axios.post("signup/", userData);
   return response.data;
 };
 
 // Login
 export const login = async (username, password) => {
-  const response = await api.post("/api/token/", { username, password });
+  const response = await axios.post("token/", { username, password });
   const { access, refresh } = response.data;
 
-  localStorage.setItem("access_token", access);
-  localStorage.setItem("refresh_token", refresh);
+  localStorage.setItem("accessToken", access);
+  localStorage.setItem("refreshToken", refresh);
 
   return response.data;
 };
 
 // Logout
 export const logout = () => {
-  localStorage.removeItem("access_token");
-  localStorage.removeItem("refresh_token");
+  localStorage.removeItem("accessToken");
+  localStorage.removeItem("refreshToken");
 };
 

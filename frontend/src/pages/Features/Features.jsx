@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useCurrency } from '../contexts/CurrencyContext';
-import VehicleAnalysis from '../components/VehicleAnalysis';
-import { getVehicles } from '../services/vehicleService';
+import { useCurrency } from '../../contexts/CurrencyContext';
+import VehicleAnalysis from '../../components/VehicleAnalysis';
+import { getVehicles } from '../../services/vehicleService';
 import './Features.css';
 
 const Features = () => {

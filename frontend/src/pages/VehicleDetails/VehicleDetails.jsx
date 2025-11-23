@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import './VehicleDetails.css';
-import { getVehicle } from '../services/vehicleService';
-import { addVehicleToCart } from '../services/cartService';
-import { translateColor, translateSpec, translateFeature, translateTag } from '../i18n/translateVehicleData';
-import { useCurrency } from '../contexts/CurrencyContext';
+import { useServices } from '../../contexts/ServicesContext';
+import { translateColor, translateSpec, translateFeature, translateTag } from '../../i18n/translateVehicleData';
+import { useCurrency } from '../../contexts/CurrencyContext';
 
 const VehicleDetails = ({ vehicleId, onBack }) => {
   const { t } = useTranslation();
+  const { vehicle: vehicleService, cart: cartService } = useServices();
   const { formatPrice } = useCurrency();
   console.log('VehicleDetails component rendering with vehicleId:', vehicleId);
   const [activeTab, setActiveTab] = useState('overview');
@@ -27,7 +27,7 @@ const VehicleDetails = ({ vehicleId, onBack }) => {
       try {
         setLoading(true);
         console.log('VehicleDetails - Fetching vehicle data...');
-        const vehicleData = await getVehicle(vehicleId);
+        const vehicleData = await vehicleService.getVehicle(vehicleId);
         console.log('VehicleDetails - Vehicle data received:', vehicleData);
         
         // Transformar datos del backend al formato esperado
@@ -250,7 +250,7 @@ const VehicleDetails = ({ vehicleId, onBack }) => {
               <button className="btn-primary cta-button" onClick={async () => {
                 try {
                   console.log('Attempting to add vehicle to cart from details:', vehicle.id);
-                  await addVehicleToCart(vehicle.id);
+                  await cartService.addVehicleToCart(vehicle.id);
                   alert(t('vehicle.addedToCart'));
                 } catch (e) {
                   console.error('Error adding to cart from details:', e);

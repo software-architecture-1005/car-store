@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import VehicleForm from '../components/VehicleForm';
-import VehicleList from '../components/VehicleList';
+import VehicleForm from '../../components/VehicleForm';
+import VehicleList from '../../components/VehicleList';
 import './Admin.css';
 
 const Admin = () => {

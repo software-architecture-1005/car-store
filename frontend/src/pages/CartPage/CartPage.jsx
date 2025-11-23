@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useAuth } from '../contexts/AuthContext';
-import { useCurrency } from '../contexts/CurrencyContext';
-import axiosGlobalInstance from '../api/axiosGlobalInstance';
-import { translateColor } from '../i18n/translateVehicleData';
+import { useAuth } from '../../contexts/AuthContext';
+import { useCurrency } from '../../contexts/CurrencyContext';
+import axiosGlobalInstance from '../../api/axiosGlobalInstance';
+import { translateColor } from '../../i18n/translateVehicleData';
 import './CartPage.css';
 
 const CartPage = ({ onViewDetails }) => {

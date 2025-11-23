@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import './Auth.css';
-import { login } from '../services/authService';
-import { useAuth } from '../contexts/AuthContext';
+import '../Auth.css';
+import { useServices } from '../../../contexts/ServicesContext';
+import { useAuth } from '../../../contexts/AuthContext';
 
 const Login = ({ onNavigate }) => {
   const { t } = useTranslation();
+  const { auth: authService } = useServices();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -18,7 +19,7 @@ const Login = ({ onNavigate }) => {
     setError('');
     
     try {
-      const response = await login({ username: email, password });
+      const response = await authService.login({ username: email, password });
       console.log('Login successful, tokens saved:', !!localStorage.getItem('accessToken'));
       authLogin({ email });
       // Redirigir al home después del login exitoso

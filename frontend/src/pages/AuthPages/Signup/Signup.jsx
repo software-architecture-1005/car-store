@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import './Auth.css';
-import { signup, login } from '../services/authService';
-import { useAuth } from '../contexts/AuthContext';
+import '../Auth.css';
+import { useServices } from '../../../contexts/ServicesContext';
+import { useAuth } from '../../../contexts/AuthContext';
 
 const Signup = ({ onNavigate }) => {
   const { t } = useTranslation();
+  const { auth: authService } = useServices();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -21,9 +22,9 @@ const Signup = ({ onNavigate }) => {
     
     try {
       const username = (email || '').trim().toLowerCase();
-      await signup({ username, email, password });
+      await authService.signup({ username, email, password });
       // Auto login para habilitar inmediatamente el carrito
-      const loginResponse = await login({ username, password });
+      const loginResponse = await authService.login({ username, password });
       console.log('Login response:', loginResponse);
       console.log('Auto-login tokens saved:', !!localStorage.getItem('accessToken'));
       setAuth({ email });
