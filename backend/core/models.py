@@ -59,6 +59,7 @@ class Vehicle(models.Model):
     year = models.PositiveIntegerField()
     color = models.CharField(max_length=50)
     price = models.DecimalField(max_digits=10, decimal_places=2)
+    is_available = models.BooleanField(default=True)
 
     seller = models.ForeignKey(Dealer, on_delete=models.CASCADE, related_name='vehicles_for_sale', null=True, blank=True)
 

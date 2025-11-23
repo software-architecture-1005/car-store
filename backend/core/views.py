@@ -120,6 +120,36 @@ class VehicleViewSet(viewsets.ModelViewSet):
         
         serializer = self.get_serializer(vehicles, many=True)
         return Response(serializer.data)
+
+    @action(detail=False, methods=['get'])
+    def available(self, request):
+        """
+        Retorna lista de vehículos disponibles (is_available=True).
+        Soporta filtros: make, category, min_price, max_price.
+        """
+        from .serializer import AvailableVehicleSerializer
+        
+        queryset = self.get_queryset().filter(is_available=True)
+        
+        # Filtros
+        make = request.query_params.get('make')
+        if make:
+            queryset = queryset.filter(make__name__icontains=make)
+            
+        category = request.query_params.get('category')
+        if category:
+            queryset = queryset.filter(category__name__icontains=category)
+            
+        min_price = request.query_params.get('min_price')
+        if min_price:
+            queryset = queryset.filter(price__gte=min_price)
+            
+        max_price = request.query_params.get('max_price')
+        if max_price:
+            queryset = queryset.filter(price__lte=max_price)
+            
+        serializer = AvailableVehicleSerializer(queryset, many=True, context={'request': request})
+        return Response(serializer.data)
     
     # Acción para obtener sugerencias de búsqueda
     @action(detail=False, methods=['get'])
@@ -151,22 +181,6 @@ class VehicleViewSet(viewsets.ModelViewSet):
             }
         
         return Response(suggestions)
-    
-    # Acción para debug - verificar datos
-    @action(detail=False, methods=['get'])
-    def debug(self, request):
-        """Endpoint para debug - verificar qué datos tenemos"""
-        debug_info = {
-            'total_vehicles': Vehicle.objects.count(),
-            'total_makes': Make.objects.count(),
-            'total_categories': Category.objects.count(),
-            'makes': list(Make.objects.values('id', 'name')),
-            'categories': list(Category.objects.values('id', 'name')),
-            'vehicles_sample': list(Vehicle.objects.select_related('make', 'category').values(
-                'id', 'model', 'make__name', 'category__name', 'year', 'price'
-            )[:5])
-        }
-        return Response(debug_info)
     
 class ReviewViewSet(viewsets.ModelViewSet):
     queryset = Review.objects.all()

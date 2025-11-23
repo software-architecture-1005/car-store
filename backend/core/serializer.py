@@ -52,7 +52,33 @@ class VehicleSerializer(serializers.ModelSerializer):
                     return None
                 return request.build_absolute_uri(url) if request else url
             return None
-                
+
+class AvailableVehicleSerializer(serializers.ModelSerializer):
+    make_name = serializers.CharField(source='make.name', read_only=True)
+    category_name = serializers.CharField(source="category.name", read_only=True)
+    price = serializers.DecimalField(max_digits=10, decimal_places=2, coerce_to_string=False)
+    image_url = serializers.SerializerMethodField()
+    vehicle_url = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Vehicle
+        fields = ['id', 'model', 'year', 'color', 'price', 'image_url', 'make_name', 'category_name', 'vehicle_url']
+    
+    def get_image_url(self, obj):
+        if obj.image:
+            request = self.context.get('request')
+            try:
+                url = obj.image.url
+            except Exception:
+                return None
+            return request.build_absolute_uri(url) if request else url
+        return None
+
+    def get_vehicle_url(self, obj):
+        # Retorna la URL del frontend para visualizar el vehículo
+        # Asumimos que el frontend corre en el puerto 3000 por defecto
+        return f"http://localhost:3000/vehicles/{obj.id}"
+
 class RoleSerializer(serializers.ModelSerializer):
         class Meta:
                 model = Role
