@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import SearchFilters from '../components/SearchFilters';
 import VehicleCard from '../components/VehicleCard';
 import { getVehicles, searchVehicles } from '../services/vehicleService';
@@ -7,6 +8,7 @@ import { getCategories } from '../services/categoryService';
 import './SearchResults.css';
 
 const SearchResults = ({ onViewDetails, initialFilters }) => {
+  const { t } = useTranslation();
   console.log('SearchResults renderizado');
   console.log('Initial filters received:', initialFilters);
   
@@ -96,12 +98,12 @@ const SearchResults = ({ onViewDetails, initialFilters }) => {
         const transformedVehicles = vehiclesData.map(vehicle => ({
           id: vehicle.id,
           image: vehicle.image_url || (vehicle.image ? `http://localhost:8000${vehicle.image}` : '/images/default-car.jpg'),
-          brand: vehicle.make_name || vehicle.make?.name || 'Sin marca',
+          brand: vehicle.make_name || vehicle.make?.name || t('vehicle.noMake'),
           model: vehicle.model,
           year: vehicle.year,
           price: parseFloat(vehicle.price),
           color: vehicle.color,
-          category: vehicle.category_name || vehicle.category?.name || 'Sin categoría',
+          category: vehicle.category_name || vehicle.category?.name || t('vehicle.noCategory'),
           make_id: vehicle.make,
           category_id: vehicle.category,
           // Datos adicionales para compatibilidad visual
@@ -111,7 +113,7 @@ const SearchResults = ({ onViewDetails, initialFilters }) => {
             { icon: '🔄', value: 'Automática' },
             { icon: '👥', value: '5 pasajeros' }
           ],
-          location: 'Colombia',
+          location: t('dealership.country'),
           isAvailable: true,
           isPromoted: false
         }));
@@ -227,12 +229,12 @@ const SearchResults = ({ onViewDetails, initialFilters }) => {
         const adapted = results.map(vehicle => ({
         id: vehicle.id,
         image: vehicle.image_url || (vehicle.image ? `http://localhost:8000${vehicle.image}` : '/images/default-car.jpg'),
-        brand: vehicle.make_name || vehicle.make?.name || 'Sin marca',
+        brand: vehicle.make_name || vehicle.make?.name || t('vehicle.noMake'),
         model: vehicle.model,
         year: vehicle.year,
         price: parseFloat(vehicle.price),
         color: vehicle.color,
-        category: vehicle.category_name || vehicle.category?.name || 'Sin categoría',
+        category: vehicle.category_name || vehicle.category?.name || t('vehicle.noCategory'),
         make_id: vehicle.make,
         category_id: vehicle.category,
         rating: 4.5,
@@ -241,7 +243,7 @@ const SearchResults = ({ onViewDetails, initialFilters }) => {
           { icon: '🔄', value: 'Automática' },
           { icon: '👥', value: '5 pasajeros' }
         ],
-        location: 'Colombia',
+        location: t('dealership.country'),
         isAvailable: true,
         isPromoted: false
         }));
@@ -294,7 +296,7 @@ const SearchResults = ({ onViewDetails, initialFilters }) => {
     return (
       <div className="search-results-loading">
         <div className="loading-spinner"></div>
-        <p>Cargando vehículos...</p>
+        <p>{t('common.loadingVehicles')}</p>
       </div>
     );
   }
@@ -319,27 +321,27 @@ const SearchResults = ({ onViewDetails, initialFilters }) => {
           <div className="results-header">
             <div className="results-info">
               <h2 className="results-title">
-                Mostrando {sortedVehicles.length} vehículos
+                {t('search.showing', { count: sortedVehicles.length })}
               </h2>
               <p className="results-subtitle">
-                Encuentra el vehículo perfecto para ti
+                {t('search.findPerfect')}
               </p>
             </div>
             
             <div className="results-controls">
               <div className="sort-control">
-                <label htmlFor="sort-select">Ordenar por:</label>
+                <label htmlFor="sort-select">{t('search.sortBy')}</label>
                 <select
                   id="sort-select"
                   value={sortBy}
                   onChange={(e) => handleSortChange(e.target.value)}
                   className="sort-select"
                 >
-                  <option value="bestMatch">Mejor coincidencia</option>
-                  <option value="priceLow">Precio: Menor a mayor</option>
-                  <option value="priceHigh">Precio: Mayor a menor</option>
-                  <option value="yearNew">Año: Más reciente</option>
-                  <option value="rating">Calificación</option>
+                  <option value="bestMatch">{t('search.bestMatch')}</option>
+                  <option value="priceLow">{t('search.priceLow')}</option>
+                  <option value="priceHigh">{t('search.priceHigh')}</option>
+                  <option value="yearNew">{t('search.yearNew')}</option>
+                  <option value="rating">{t('search.rating')}</option>
                 </select>
               </div>
             </div>
@@ -359,8 +361,8 @@ const SearchResults = ({ onViewDetails, initialFilters }) => {
             ) : (
               <div className="no-results">
                 <div className="no-results-icon">🚗</div>
-                <h3>No se encontraron vehículos</h3>
-                <p>Intenta ajustar tus filtros de búsqueda</p>
+                <h3>{t('search.noResults')}</h3>
+                <p>{t('search.noResultsDesc')}</p>
                 <button 
                   className="btn-primary"
                   onClick={() => {
@@ -377,7 +379,7 @@ const SearchResults = ({ onViewDetails, initialFilters }) => {
                     setFilters(resetFilters);
                   }}
                 >
-                  Limpiar Filtros
+                  {t('common.clearFilters')}
                 </button>
               </div>
             )}
@@ -390,7 +392,7 @@ const SearchResults = ({ onViewDetails, initialFilters }) => {
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
                 </svg>
-                Anterior
+                {t('common.previous')}
               </button>
               
               <div className="pagination-numbers">
@@ -402,7 +404,7 @@ const SearchResults = ({ onViewDetails, initialFilters }) => {
               </div>
               
               <button className="pagination-btn">
-                Siguiente
+                {t('common.next')}
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
                 </svg>

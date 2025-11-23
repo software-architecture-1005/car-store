@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import './Auth.css';
 import { login } from '../services/authService';
 import { useAuth } from '../contexts/AuthContext';
 
 const Login = ({ onNavigate }) => {
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -24,7 +26,7 @@ const Login = ({ onNavigate }) => {
         onNavigate('home');
       }
     } catch (err) {
-      setError('Credenciales incorrectas. Intenta nuevamente.');
+      setError(t('auth.invalidCredentials'));
     } finally {
       setLoading(false);
     }
@@ -33,7 +35,7 @@ const Login = ({ onNavigate }) => {
   return (
     <section className="auth-page">
       <div className="auth-container">
-        <h1 className="auth-title">Iniciar sesión</h1>
+        <h1 className="auth-title">{t('auth.login')}</h1>
         
         {error && (
           <div className="error-message">
@@ -43,39 +45,39 @@ const Login = ({ onNavigate }) => {
         
         <form className="auth-form" onSubmit={handleSubmit}>
           <div className="form-field">
-            <label>Nombre de usuario o Email</label>
+            <label>{t('auth.username')}</label>
             <input 
               type="text" 
               value={email} 
               onChange={(e) => setEmail(e.target.value)} 
-              placeholder="usuario o email@ejemplo.com"
+              placeholder={t('auth.emailPlaceholder')}
               required 
             />
           </div>
           
           <div className="form-field">
-            <label>Contraseña</label>
+            <label>{t('auth.password')}</label>
             <input 
               type="password" 
               value={password} 
               onChange={(e) => setPassword(e.target.value)} 
-              placeholder="••••••••"
+              placeholder={t('auth.passwordPlaceholder')}
               required 
             />
           </div>
           
           <button type="submit" className="btn-primary" disabled={loading}>
-            {loading ? 'Ingresando...' : 'Ingresar'}
+            {loading ? t('auth.loggingIn') : t('auth.login')}
           </button>
         </form>
         
         <div className="auth-footer">
-          <p>¿No tienes cuenta? 
+          <p>{t('auth.noAccount')} 
             <button 
               className="link-button" 
               onClick={() => onNavigate && onNavigate('signup')}
             >
-              Regístrate aquí
+              {t('auth.signup')}
             </button>
           </p>
         </div>

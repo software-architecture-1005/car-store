@@ -1,9 +1,12 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import './VehicleCard.css';
 import { useComparison } from '../contexts/ComparisonContext';
 import { addVehicleToCart } from '../services/cartService';
+import { translateColor, translateSpec } from '../i18n/translateVehicleData';
 
 const VehicleCard = ({ vehicle, onViewDetails, onCompare }) => {
+  const { t } = useTranslation();
   const {
     id,
     image,
@@ -25,7 +28,7 @@ const VehicleCard = ({ vehicle, onViewDetails, onCompare }) => {
   try {
     comparisonContext = useComparison();
   } catch (error) {
-    console.warn('ComparisonContext no disponible:', error);
+    console.warn('ComparisonContext not available:', error);
     comparisonContext = {
       addToComparison: () => {},
       removeFromComparison: () => {},
@@ -48,11 +51,11 @@ const VehicleCard = ({ vehicle, onViewDetails, onCompare }) => {
     try {
       console.log('Attempting to add vehicle to cart:', id);
       await addVehicleToCart(id);
-      alert('Vehículo agregado al carrito');
+      alert(t('vehicle.addedToCart'));
     } catch (error) {
       console.error('Error al agregar al carrito', error);
       const errorMessage = error.response?.data?.error || error.message || 'Error desconocido';
-      alert(`No se pudo agregar al carrito: ${errorMessage}`);
+      alert(`${t('common.error')}: ${errorMessage}`);
     }
   };
 
@@ -97,7 +100,7 @@ const VehicleCard = ({ vehicle, onViewDetails, onCompare }) => {
       {isPromoted && (
         <div className="promotion-badge">
           <span className="promotion-icon">⭐</span>
-          <span className="promotion-text">Destacado</span>
+          <span className="promotion-text">{t('vehicle.promoted')}</span>
         </div>
       )}
       
@@ -116,7 +119,7 @@ const VehicleCard = ({ vehicle, onViewDetails, onCompare }) => {
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
               <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
             </svg>
-            Ver Detalles
+            {t('vehicle.viewDetails')}
           </button>
           <button 
             className="overlay-btn compare-btn"
@@ -125,7 +128,7 @@ const VehicleCard = ({ vehicle, onViewDetails, onCompare }) => {
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
               <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zm10 0c-1.1 0-1.99.9-1.99 2S15.9 22 17 22s2-.9 2-2-.9-2-2-2zM7.82 12.94l.03.05c.22.23.53.36.85.36h7.46c.54 0 1.02-.33 1.21-.84l2.54-6.79A1 1 0 0019 4H6.21l-.94-2H2v2h2l3.6 7.59-1.35 2.44C5.52 14.36 6.48 16 8 16h10v-2H8l1.82-3.06z"/>
             </svg>
-            Agregar al carrito
+            {t('vehicle.addToCart')}
           </button>
         </div>
       </div>
@@ -147,18 +150,18 @@ const VehicleCard = ({ vehicle, onViewDetails, onCompare }) => {
           {specifications.map((spec, index) => (
             <div key={index} className="spec-item">
               <span className="spec-icon">{spec.icon}</span>
-              <span className="spec-text">{spec.value}</span>
+              <span className="spec-text">{translateSpec(spec.value, t)}</span>
             </div>
           ))}
         </div>
 
         <div className="vehicle-details">
           <div className="detail-item">
-            <span className="detail-label">Color:</span>
-            <span className="detail-value">{color}</span>
+            <span className="detail-label">{t('vehicle.color')}:</span>
+            <span className="detail-value">{translateColor(color, t)}</span>
           </div>
           <div className="detail-item">
-            <span className="detail-label">Categoría:</span>
+            <span className="detail-label">{t('vehicle.category')}:</span>
             <span className="detail-value">{category}</span>
           </div>
         </div>
@@ -172,15 +175,15 @@ const VehicleCard = ({ vehicle, onViewDetails, onCompare }) => {
 
         <div className="card-footer">
           <div className="price-container">
-            <span className="price-label">Precio</span>
+            <span className="price-label">{t('vehicle.price')}</span>
             <span className="price-value">{formatPrice(price)}</span>
           </div>
           
           <div className="availability">
             {isAvailable ? (
-              <span className="available">Disponible</span>
+              <span className="available">{t('vehicle.available')}</span>
             ) : (
-              <span className="unavailable">No disponible</span>
+              <span className="unavailable">{t('vehicle.notAvailable')}</span>
             )}
           </div>
         </div>

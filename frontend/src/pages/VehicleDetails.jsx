@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import './VehicleDetails.css';
 import { getVehicle } from '../services/vehicleService';
 import { addVehicleToCart } from '../services/cartService';
+import { translateColor, translateSpec, translateFeature, translateTag } from '../i18n/translateVehicleData';
 
 const VehicleDetails = ({ vehicleId, onBack }) => {
+  const { t } = useTranslation();
   console.log('VehicleDetails component rendering with vehicleId:', vehicleId);
   const [activeTab, setActiveTab] = useState('overview');
   const [vehicle, setVehicle] = useState(null);
@@ -14,7 +17,7 @@ const VehicleDetails = ({ vehicleId, onBack }) => {
     const loadVehicle = async () => {
       console.log('VehicleDetails - Loading vehicle with ID:', vehicleId);
       if (!vehicleId) {
-        setError('ID de vehículo no proporcionado');
+        setError(t('errors.vehicleIdNotProvided'));
         setLoading(false);
         return;
       }
@@ -29,15 +32,15 @@ const VehicleDetails = ({ vehicleId, onBack }) => {
         const transformedVehicle = {
           id: vehicleData.id,
           images: [vehicleData.image_url || (vehicleData.image ? `http://localhost:8000${vehicleData.image}` : '/images/default-car.jpg')],
-          brand: vehicleData.make_name || vehicleData.make?.name || 'Sin marca',
+          brand: vehicleData.make_name || vehicleData.make?.name || t('vehicle.noMake'),
           model: vehicleData.model,
           year: vehicleData.year,
           price: parseFloat(vehicleData.price),
           rating: 4.5, // Rating por defecto
-          location: 'Colombia',
+          location: t('dealership.country'),
           isAvailable: true,
           color: vehicleData.color,
-          category: vehicleData.category_name || vehicleData.category?.name || 'Sin categoría',
+          category: vehicleData.category_name || vehicleData.category?.name || t('vehicle.noCategory'),
           // Especificaciones por defecto (en el futuro se pueden obtener del backend)
           specifications: {
             engine: 'Motor estándar',
@@ -68,10 +71,10 @@ const VehicleDetails = ({ vehicleId, onBack }) => {
           },
           expertReviews: [
             {
-              source: 'AutoMatch Review',
+              source: 'reviewSource',
               rating: 4.5,
-              quote: 'Un vehículo confiable con buenas características para el mercado colombiano.',
-              author: 'Equipo AutoMatch',
+              quote: 'reviewQuote',
+              author: 'reviewAuthor',
               date: new Date().toISOString().split('T')[0]
             }
           ],
@@ -85,10 +88,10 @@ const VehicleDetails = ({ vehicleId, onBack }) => {
           ],
           dealerships: [
             {
-              name: 'Concesionario Principal',
-              address: 'Colombia',
-              phone: 'Contactar para más información',
-              distance: 'Consultar ubicación',
+              name: 'mainDealer',
+              address: 'country',
+              phone: 'contactForInfo',
+              distance: 'consultLocation',
               stock: 1
             }
           ]
@@ -97,7 +100,7 @@ const VehicleDetails = ({ vehicleId, onBack }) => {
         setVehicle(transformedVehicle);
       } catch (err) {
         console.error('Error cargando vehículo:', err);
-        setError('Error al cargar los detalles del vehículo');
+        setError(t('errors.loadingVehicleDetails'));
       } finally {
         setLoading(false);
       }
@@ -112,7 +115,7 @@ const VehicleDetails = ({ vehicleId, onBack }) => {
         <div className="vehicle-details-container">
           <div className="loading-spinner">
             <div className="spinner"></div>
-            <p>Cargando detalles del vehículo...</p>
+            <p>{t('details.loadingDetails')}</p>
           </div>
         </div>
       </div>
@@ -125,10 +128,10 @@ const VehicleDetails = ({ vehicleId, onBack }) => {
         <div className="vehicle-details-container">
           <div className="error-message">
             <h2>Error</h2>
-            <p>{error || 'Vehículo no encontrado'}</p>
+            <p>{error || t('vehicle.notFound')}</p>
             {onBack && (
               <button className="btn-primary" onClick={onBack}>
-                Volver a la búsqueda
+                {t('details.backToSearch')}
               </button>
             )}
           </div>
@@ -168,10 +171,10 @@ const VehicleDetails = ({ vehicleId, onBack }) => {
   };
 
   const tabs = [
-    { id: 'overview', label: 'Resumen', icon: '📊' },
-    { id: 'specs', label: 'Especificaciones', icon: '⚙️' },
-    { id: 'reviews', label: 'Reseñas', icon: '⭐' },
-    { id: 'dealers', label: 'Concesionarios', icon: '🏢' }
+    { id: 'overview', label: t('details.tabs.overview'), icon: '📊' },
+    { id: 'specs', label: t('details.tabs.specs'), icon: '⚙️' },
+    { id: 'reviews', label: t('details.tabs.reviews'), icon: '⭐' },
+    { id: 'dealers', label: t('details.tabs.dealers'), icon: '🏢' }
   ];
 
   return (
@@ -184,7 +187,7 @@ const VehicleDetails = ({ vehicleId, onBack }) => {
               <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
               </svg>
-              Volver a la búsqueda
+              {t('details.backToSearch')}
             </button>
           </div>
         )}
@@ -198,7 +201,7 @@ const VehicleDetails = ({ vehicleId, onBack }) => {
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>
                   </svg>
-                  Ver todas las fotos
+                  {t('details.viewAllPhotos')}
                 </button>
               </div>
             </div>
@@ -211,7 +214,7 @@ const VehicleDetails = ({ vehicleId, onBack }) => {
 
           <div className="vehicle-info">
             <div className="vehicle-badge">
-              <span className="badge-text">Híbrido</span>
+              <span className="badge-text">{translateSpec('Híbrido', t)}</span>
             </div>
             
             <h1 className="vehicle-title">
@@ -219,9 +222,9 @@ const VehicleDetails = ({ vehicleId, onBack }) => {
             </h1>
             
             <div className="vehicle-subtitle">
-              <span className="transmission">{vehicle.specifications.transmission}</span>
+              <span className="transmission">{translateSpec(vehicle.specifications.transmission, t)}</span>
               <span className="separator">•</span>
-              <span className="fuel-type">{vehicle.specifications.fuelType}</span>
+              <span className="fuel-type">{translateSpec(vehicle.specifications.fuelType, t)}</span>
             </div>
 
             <div className="vehicle-rating">
@@ -229,7 +232,7 @@ const VehicleDetails = ({ vehicleId, onBack }) => {
                 {renderStars(vehicle.rating)}
               </div>
               <span className="rating-value">{vehicle.rating}</span>
-              <span className="rating-label">Calificación promedio</span>
+              <span className="rating-label">{t('details.averageRating')}</span>
             </div>
 
             <div className="vehicle-location">
@@ -244,8 +247,8 @@ const VehicleDetails = ({ vehicleId, onBack }) => {
                 <span className="price-value">{formatPrice(vehicle.price)}</span>
               </div>
               <div className="price-details">
-                <span className="price-label">Precio del vehículo</span>
-                <span className="price-note">*Precio de contado</span>
+                <span className="price-label">{t('details.vehiclePrice')}</span>
+                <span className="price-note">{t('details.cashPrice')}</span>
               </div>
             </div>
 
@@ -254,23 +257,23 @@ const VehicleDetails = ({ vehicleId, onBack }) => {
                 try {
                   console.log('Attempting to add vehicle to cart from details:', vehicle.id);
                   await addVehicleToCart(vehicle.id);
-                  alert('Vehículo agregado al carrito');
+                  alert(t('vehicle.addedToCart'));
                 } catch (e) {
                   console.error('Error adding to cart from details:', e);
-                  const errorMessage = e.response?.data?.error || e.message || 'Error desconocido';
-                  alert(`No se pudo agregar al carrito: ${errorMessage}`);
+                  const errorMessage = e.response?.data?.error || e.message || t('common.error');
+                  alert(`${t('common.error')}: ${errorMessage}`);
                 }
               }}>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zm10 0c-1.1 0-1.99.9-1.99 2S15.9 22 17 22s2-.9 2-2-.9-2-2-2zM7.82 12.94l.03.05c.22.23.53.36.85.36h7.46c.54 0 1.02-.33 1.21-.84l2.54-6.79A1 1 0 0019 4H6.21l-.94-2H2v2h2l3.6 7.59-1.35 2.44C5.52 14.36 6.48 16 8 16h10v-2H8l1.82-3.06z"/>
                 </svg>
-                Agregar al carrito
+                {t('details.addToCart')}
               </button>
               <button className="btn-secondary">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                 </svg>
-                Guardar
+                {t('details.save')}
               </button>
             </div>
           </div>
@@ -278,24 +281,24 @@ const VehicleDetails = ({ vehicleId, onBack }) => {
 
         {/* Dashboard Visual */}
         <div className="dashboard-section">
-          <h2 className="section-title">Dashboard Visual</h2>
+          <h2 className="section-title">{t('details.visualDashboard')}</h2>
           <div className="dashboard-grid">
             <div className="dashboard-card performance">
               <div className="card-icon">⚡</div>
               <div className="card-content">
-                <h3>Motor y Rendimiento</h3>
+                <h3>{t('details.enginePerformance')}</h3>
                 <div className="specs-grid">
                   <div className="spec-item">
-                    <span className="spec-label">Potencia</span>
-                    <span className="spec-value">{vehicle.specifications.power}</span>
+                    <span className="spec-label">{t('comparison.specs.power')}</span>
+                    <span className="spec-value">{translateSpec(vehicle.specifications.power, t)}</span>
                   </div>
                   <div className="spec-item">
-                    <span className="spec-label">Torque</span>
-                    <span className="spec-value">{vehicle.specifications.torque}</span>
+                    <span className="spec-label">{t('comparison.specs.torque')}</span>
+                    <span className="spec-value">{translateSpec(vehicle.specifications.torque, t)}</span>
                   </div>
                   <div className="spec-item">
-                    <span className="spec-label">Consumo</span>
-                    <span className="spec-value">{vehicle.specifications.fuelConsumption}</span>
+                    <span className="spec-label">{t('comparison.specs.fuelConsumption')}</span>
+                    <span className="spec-value">{translateSpec(vehicle.specifications.fuelConsumption, t)}</span>
                   </div>
                 </div>
               </div>
@@ -304,11 +307,11 @@ const VehicleDetails = ({ vehicleId, onBack }) => {
             <div className="dashboard-card ratings">
               <div className="card-icon">⭐</div>
               <div className="card-content">
-                <h3>Puntuación de Expertos</h3>
+                <h3>{t('details.expertScore')}</h3>
                 <div className="ratings-grid">
                   {Object.entries(vehicle.expertRatings).map(([key, value]) => (
                     <div key={key} className="rating-item">
-                      <span className="rating-label">{key.charAt(0).toUpperCase() + key.slice(1)}</span>
+                      <span className="rating-label">{t(`analysis.categories.${key}`, key.charAt(0).toUpperCase() + key.slice(1))}</span>
                       <div className="rating-bar">
                         <div 
                           className="rating-fill" 
@@ -325,10 +328,10 @@ const VehicleDetails = ({ vehicleId, onBack }) => {
             <div className="dashboard-card ideal-for">
               <div className="card-icon">🎯</div>
               <div className="card-content">
-                <h3>Ideal para</h3>
+                <h3>{t('details.idealFor')}</h3>
                 <div className="tags">
                   {vehicle.idealFor.map((tag, index) => (
-                    <span key={index} className="tag">{tag}</span>
+                    <span key={index} className="tag">{translateTag(tag, t)}</span>
                   ))}
                 </div>
               </div>
@@ -355,12 +358,12 @@ const VehicleDetails = ({ vehicleId, onBack }) => {
             {activeTab === 'overview' && (
               <div className="overview-content">
                 <div className="features-grid">
-                  <h3>Características Principales</h3>
+                  <h3>{t('details.mainFeatures')}</h3>
                   <div className="features-list">
                     {vehicle.features.map((feature, index) => (
                       <div key={index} className="feature-item">
                         <span className="feature-icon">✓</span>
-                        <span className="feature-text">{feature}</span>
+                        <span className="feature-text">{translateFeature(feature, t)}</span>
                       </div>
                     ))}
                   </div>
@@ -370,12 +373,12 @@ const VehicleDetails = ({ vehicleId, onBack }) => {
 
             {activeTab === 'specs' && (
               <div className="specs-content">
-                <h3>Especificaciones Técnicas</h3>
+                <h3>{t('details.specsTitle')}</h3>
                 <div className="specs-table">
                   {Object.entries(vehicle.specifications).map(([key, value]) => (
                     <div key={key} className="spec-row">
-                      <span className="spec-key">{key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}</span>
-                      <span className="spec-value">{value}</span>
+                      <span className="spec-key">{t(`specLabels.${key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1')}`) || key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}</span>
+                      <span className="spec-value">{translateSpec(value, t)}</span>
                     </div>
                   ))}
                 </div>
@@ -384,25 +387,25 @@ const VehicleDetails = ({ vehicleId, onBack }) => {
 
             {activeTab === 'reviews' && (
               <div className="reviews-content">
-                <h3>Reseñas de Expertos</h3>
+                <h3>{t('details.expertReviews')}</h3>
                 <div className="reviews-list">
                   {vehicle.expertReviews.map((review, index) => (
                     <div key={index} className="review-card">
                       <div className="review-header">
                         <div className="review-source">
-                          <h4>{review.source}</h4>
+                          <h4>{t(`details.${review.source}`)}</h4>
                           <div className="review-rating">
                             {renderStars(review.rating)}
                             <span className="rating-value">{review.rating}</span>
                           </div>
                         </div>
                         <div className="review-meta">
-                          <span className="review-author">{review.author}</span>
+                          <span className="review-author">{t(`details.${review.author}`)}</span>
                           <span className="review-date">{new Date(review.date).toLocaleDateString('es-CO')}</span>
                         </div>
                       </div>
                       <blockquote className="review-quote">
-                        "{review.quote}"
+                        "{t(`details.${review.quote}`)}"
                       </blockquote>
                     </div>
                   ))}
@@ -412,21 +415,21 @@ const VehicleDetails = ({ vehicleId, onBack }) => {
 
             {activeTab === 'dealers' && (
               <div className="dealers-content">
-                <h3>Concesionarios Disponibles</h3>
+                <h3>{t('details.availableDealers')}</h3>
                 <div className="dealers-list">
                   {vehicle.dealerships.map((dealer, index) => (
                     <div key={index} className="dealer-card">
                       <div className="dealer-info">
-                        <h4>{dealer.name}</h4>
-                        <p className="dealer-address">{dealer.address}</p>
-                        <p className="dealer-phone">{dealer.phone}</p>
+                        <h4>{t(`dealership.${dealer.name}`)}</h4>
+                        <p className="dealer-address">{t(`dealership.${dealer.address}`)}</p>
+                        <p className="dealer-phone">{t(`dealership.${dealer.phone}`)}</p>
                         <div className="dealer-meta">
-                          <span className="dealer-distance">{dealer.distance}</span>
-                          <span className="dealer-stock">{dealer.stock} unidades</span>
+                          <span className="dealer-distance">{t(`dealership.${dealer.distance}`)}</span>
+                          <span className="dealer-stock">{dealer.stock} {t('details.units')}</span>
                         </div>
                       </div>
                       <button className="btn-primary dealer-contact">
-                        Contactar
+                        {t('details.contact')}
                       </button>
                     </div>
                   ))}

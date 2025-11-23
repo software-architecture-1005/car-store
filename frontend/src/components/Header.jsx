@@ -1,15 +1,21 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import './Header.css';
 import logoImage from '../assets/Logo-automatch-sin-fondo.png';
 import { useAuth } from '../contexts/AuthContext';
 
 const Header = ({ currentPage, onNavigate }) => {
   const { isAuthenticated, user, logout } = useAuth();
+  const { t, i18n } = useTranslation();
   
   const handleNavigation = (page) => {
     if (onNavigate) {
       onNavigate(page);
     }
+  };
+
+  const changeLanguage = (lng) => {
+    i18n.changeLanguage(lng);
   };
 
   return (
@@ -35,33 +41,33 @@ const Header = ({ currentPage, onNavigate }) => {
             className={`nav-link ${currentPage === 'home' ? 'active' : ''}`}
             onClick={() => handleNavigation('home')}
           >
-            Inicio
+            {t('nav.home')}
           </button>
 
           <button 
             className={`nav-link ${currentPage === 'search' ? 'active' : ''}`}
             onClick={() => handleNavigation('search')}
           >
-            Catálogo
+            {t('nav.vehicles')}
           </button>
 
           <button 
             className={`nav-link ${currentPage === 'comparison' ? 'active' : ''}`}
             onClick={() => handleNavigation('comparison')}
           >
-            Comparar
+            {t('nav.compare')}
           </button>
           <button 
             className={`nav-link ${currentPage === 'features' ? 'active' : ''}`}
             onClick={() => handleNavigation('features')}
           >
-            Características
+            {t('nav.features')}
           </button>
           <button 
             className="nav-link"
             onClick={() => handleNavigation('cart')}
           >
-            Carrito
+            {t('nav.cart')}
           </button>
 
           {isAuthenticated ? (
@@ -70,7 +76,7 @@ const Header = ({ currentPage, onNavigate }) => {
                 className={`nav-link ${currentPage === 'admin' ? 'active' : ''}`} 
                 onClick={() => handleNavigation('admin')}
               >
-                Admin
+                {t('nav.admin')}
               </button>
               <button 
                 className="nav-link" 
@@ -79,7 +85,7 @@ const Header = ({ currentPage, onNavigate }) => {
                   handleNavigation('home');
                 }}
               >
-                Cerrar Sesión
+                {t('nav.logout')}
               </button>
             </>
           ) : (
@@ -88,17 +94,35 @@ const Header = ({ currentPage, onNavigate }) => {
                 className={`nav-link ${currentPage === 'signup' ? 'active' : ''}`} 
                 onClick={() => handleNavigation('signup')}
               >
-                Registrarse
+                {t('nav.signup')}
               </button>
 
               <button
                 className={`nav-link ${currentPage === 'login' ? 'active' : ''}`} 
                 onClick={() => handleNavigation('login')}
               >
-                Iniciar Sesión
+                {t('nav.login')}
               </button>
             </>
           )}
+
+          {/* Language Selector */}
+          <div style={{ marginLeft: '20px', display: 'flex', gap: '5px' }}>
+            <button 
+              className={`nav-link ${i18n.language === 'es' ? 'active' : ''}`}
+              onClick={() => changeLanguage('es')}
+              style={{ padding: '5px 10px', fontSize: '0.9em' }}
+            >
+              ES
+            </button>
+            <button 
+              className={`nav-link ${i18n.language === 'en' ? 'active' : ''}`}
+              onClick={() => changeLanguage('en')}
+              style={{ padding: '5px 10px', fontSize: '0.9em' }}
+            >
+              EN
+            </button>
+          </div>
         </nav>
 
       </div>

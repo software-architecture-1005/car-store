@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
 import axiosGlobalInstance from '../api/axiosGlobalInstance';
+import { translateColor } from '../i18n/translateVehicleData';
 import './CartPage.css';
 
 const CartPage = ({ onViewDetails }) => {
+  const { t } = useTranslation();
   console.log('CartPage component rendering');
   const { isAuthenticated, user } = useAuth();
   const [cartItems, setCartItems] = useState([]);
@@ -38,7 +41,7 @@ const CartPage = ({ onViewDetails }) => {
       }
     } catch (err) {
       console.error('Error fetching cart:', err);
-      setError('No se pudo cargar el carrito. Por favor, inicia sesión.');
+      setError(t('cart.empty'));
     } finally {
       setLoading(false);
     }
@@ -65,9 +68,9 @@ const CartPage = ({ onViewDetails }) => {
     return (
       <div className="cart-page">
         <div className="cart-container">
-          <h1>Carrito de Compras</h1>
+          <h1>{t('cart.title')}</h1>
           <div className="error-message">
-            No se pudo cargar el carrito. Por favor, inicia sesión.
+            {t('cart.empty')}
           </div>
         </div>
       </div>
@@ -78,8 +81,8 @@ const CartPage = ({ onViewDetails }) => {
     return (
       <div className="cart-page">
         <div className="cart-container">
-          <h1>Carrito de Compras</h1>
-          <div className="loading">Cargando carrito...</div>
+          <h1>{t('cart.title')}</h1>
+          <div className="loading">{t('common.loading')}</div>
         </div>
       </div>
     );
@@ -88,7 +91,7 @@ const CartPage = ({ onViewDetails }) => {
   return (
     <div className="cart-page">
       <div className="cart-container">
-        <h1>Carrito de Compras</h1>
+        <h1>{t('cart.title')}</h1>
         
         {error && (
           <div className="error-message">
@@ -98,8 +101,8 @@ const CartPage = ({ onViewDetails }) => {
 
         {cartItems.length === 0 ? (
           <div className="empty-cart">
-            <h2>Tu carrito está vacío</h2>
-            <p>Agrega algunos vehículos para comenzar tu compra.</p>
+            <h2>{t('cart.empty')}</h2>
+            <p>{t('cart.continueShopping')}</p>
           </div>
         ) : (
           <div className="cart-items">
@@ -113,8 +116,8 @@ const CartPage = ({ onViewDetails }) => {
                 </div>
                 <div className="item-details">
                   <h3>{item.vehicle.year} {item.vehicle.make.name} {item.vehicle.model}</h3>
-                  <p>Categoría: {item.vehicle.category.name}</p>
-                  <p>Color: {item.vehicle.color}</p>
+                  <p>{t('vehicle.category')}: {item.vehicle.category.name}</p>
+                  <p>{t('vehicle.color')}: {translateColor(item.vehicle.color, t)}</p>
                   <p className="price">${item.vehicle.price.toLocaleString()}</p>
                 </div>
                 <div className="item-actions">
@@ -122,24 +125,24 @@ const CartPage = ({ onViewDetails }) => {
                     className="btn-secondary"
                     onClick={() => onViewDetails && onViewDetails(item.vehicle.id)}
                   >
-                    Ver Detalles
+                    {t('vehicle.viewDetails')}
                   </button>
                   <button 
                     className="btn-danger"
                     onClick={() => removeFromCart(item.id)}
                   >
-                    Eliminar
+                    {t('cart.remove')}
                   </button>
                 </div>
               </div>
             ))}
             
             <div className="cart-summary">
-              <h3>Resumen</h3>
-              <p>Total de vehículos: {cartItems.length}</p>
-              <p>Precio total: ${cartItems.reduce((sum, item) => sum + item.vehicle.price, 0).toLocaleString()}</p>
+              <h3>{t('cart.title')}</h3>
+              <p>{t('search.resultsCount', { count: cartItems.length })}</p>
+              <p>{t('cart.total')}: ${cartItems.reduce((sum, item) => sum + item.vehicle.price, 0).toLocaleString()}</p>
               <button className="btn-primary btn-checkout">
-                Proceder al Pago
+                {t('cart.checkout')}
               </button>
             </div>
           </div>

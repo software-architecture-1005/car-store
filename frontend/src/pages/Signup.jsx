@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import './Auth.css';
 import { signup, login } from '../services/authService';
 import { useAuth } from '../contexts/AuthContext';
 
 const Signup = ({ onNavigate }) => {
+  const { t } = useTranslation();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -39,7 +41,7 @@ const Signup = ({ onNavigate }) => {
         const msg = Array.isArray(apiErr[firstKey]) ? apiErr[firstKey][0] : (apiErr.detail || 'Error al crear la cuenta.');
         setError(String(msg));
       } else {
-        setError('Error al crear la cuenta. Intenta nuevamente.');
+        setError(t('auth.createAccountError'));
       }
     } finally {
       setLoading(false);
@@ -50,10 +52,10 @@ const Signup = ({ onNavigate }) => {
     return (
       <section className="auth-page">
         <div className="auth-container">
-          <h1 className="auth-title">¡Cuenta creada!</h1>
+          <h1 className="auth-title">{t('auth.accountCreated')}</h1>
           <div className="success-message">
-            <p>Tu cuenta ha sido creada exitosamente.</p>
-            <p>Redirigiendo al login...</p>
+            <p>{t('auth.accountCreatedSuccess')}</p>
+            <p>{t('auth.redirectingToLogin')}</p>
           </div>
         </div>
       </section>
@@ -63,7 +65,7 @@ const Signup = ({ onNavigate }) => {
   return (
     <section className="auth-page">
       <div className="auth-container">
-        <h1 className="auth-title">Crear cuenta</h1>
+        <h1 className="auth-title">{t('auth.createAccount')}</h1>
         
         {error && (
           <div className="error-message">
@@ -73,50 +75,50 @@ const Signup = ({ onNavigate }) => {
         
         <form className="auth-form" onSubmit={handleSubmit}>
           <div className="form-field">
-            <label>Nombre completo</label>
+            <label>{t('auth.fullName')}</label>
             <input 
               type="text" 
               value={name} 
               onChange={(e) => setName(e.target.value)} 
-              placeholder="Tu nombre completo"
+              placeholder={t('auth.fullNamePlaceholder')}
               required 
             />
           </div>
           
           <div className="form-field">
-            <label>Correo electrónico</label>
+            <label>{t('auth.email')}</label>
             <input 
               type="email" 
               value={email} 
               onChange={(e) => setEmail(e.target.value)} 
-              placeholder="tu@email.com"
+              placeholder={t('auth.emailPlaceholder')}
               required 
             />
           </div>
           
           <div className="form-field">
-            <label>Contraseña</label>
+            <label>{t('auth.password')}</label>
             <input 
               type="password" 
               value={password} 
               onChange={(e) => setPassword(e.target.value)} 
-              placeholder="••••••••"
+              placeholder={t('auth.passwordPlaceholder')}
               required 
             />
           </div>
           
           <button type="submit" className="btn-primary" disabled={loading}>
-            {loading ? 'Creando...' : 'Crear cuenta'}
+            {loading ? t('auth.creating') : t('auth.createAccount')}
           </button>
         </form>
         
         <div className="auth-footer">
-          <p>¿Ya tienes cuenta? 
+          <p>{t('auth.hasAccount')} 
             <button 
               className="link-button" 
               onClick={() => onNavigate && onNavigate('login')}
             >
-              Inicia sesión aquí
+              {t('auth.loginHere')}
             </button>
           </p>
         </div>

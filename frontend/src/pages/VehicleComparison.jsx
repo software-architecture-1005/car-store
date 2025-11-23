@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import './VehicleComparison.css';
 import { useComparison } from '../contexts/ComparisonContext';
 import { getVehicles } from '../services/vehicleService';
 
 const VehicleComparison = () => {
+  const { t } = useTranslation();
   const { comparisonVehicles, removeFromComparison, clearComparison, addToComparison, isInComparison, canAddMore } = useComparison();
   const [allVehicles, setAllVehicles] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -16,12 +18,12 @@ const VehicleComparison = () => {
         const transformedVehicles = data.map(vehicle => ({
           id: vehicle.id,
           image: vehicle.image_url || (vehicle.image ? `http://localhost:8000${vehicle.image}` : '/images/default-car.jpg'),
-          brand: vehicle.make_name || vehicle.make?.name || 'Sin marca',
+          brand: vehicle.make_name || vehicle.make?.name || t('vehicle.noMake'),
           model: vehicle.model,
           year: vehicle.year,
           price: parseFloat(vehicle.price),
           color: vehicle.color,
-          category: vehicle.category_name || vehicle.category?.name || 'Sin categoría',
+          category: vehicle.category_name || vehicle.category?.name || t('vehicle.noCategory'),
           rating: 4.5,
           specifications: {
             engine: 'Motor estándar',
@@ -66,6 +68,33 @@ const VehicleComparison = () => {
     }).format(price);
   };
 
+  const translateSpecValue = (value, specKey, t) => {
+    if (typeof value !== 'string') return value;
+    
+    // Traducir según el tipo de especificación
+    switch (specKey) {
+      case 'transmission':
+        return t(`vehicleData.transmissions.${value}`, value);
+      case 'fuelType':
+        return t(`vehicleData.fuelTypes.${value}`, value);
+      case 'engine':
+      case 'power':
+      case 'torque':
+      case 'fuelConsumption':
+      case 'acceleration':
+      case 'topSpeed':
+      case 'cargo':
+      case 'drivetrain':
+      case 'weight':
+      case 'length':
+      case 'width':
+      case 'height':
+        return t(`vehicleFeatures.${value}`, value);
+      default:
+        return value;
+    }
+  };
+
   const renderStars = (rating) => {
     const stars = [];
     const fullStars = Math.floor(rating);
@@ -91,31 +120,31 @@ const VehicleComparison = () => {
   const hasEmptySlots = comparisonVehicles.length < 3;
 
   const comparisonSpecs = [
-    { key: 'engine', label: 'Motor' },
-    { key: 'power', label: 'Potencia' },
-    { key: 'torque', label: 'Torque' },
-    { key: 'transmission', label: 'Transmisión' },
-    { key: 'fuelType', label: 'Combustible' },
-    { key: 'fuelConsumption', label: 'Consumo' },
-    { key: 'acceleration', label: 'Aceleración 0-100' },
-    { key: 'topSpeed', label: 'Velocidad máxima' },
-    { key: 'seats', label: 'Asientos' },
-    { key: 'doors', label: 'Puertas' },
-    { key: 'cargo', label: 'Maletero' },
-    { key: 'drivetrain', label: 'Tracción' },
-    { key: 'weight', label: 'Peso' },
-    { key: 'length', label: 'Longitud' },
-    { key: 'width', label: 'Ancho' },
-    { key: 'height', label: 'Alto' }
+    { key: 'engine', label: t('comparison.specs.engine') },
+    { key: 'power', label: t('comparison.specs.power') },
+    { key: 'torque', label: t('comparison.specs.torque') },
+    { key: 'transmission', label: t('comparison.specs.transmission') },
+    { key: 'fuelType', label: t('comparison.specs.fuelType') },
+    { key: 'fuelConsumption', label: t('comparison.specs.fuelConsumption') },
+    { key: 'acceleration', label: t('comparison.specs.acceleration') },
+    { key: 'topSpeed', label: t('comparison.specs.topSpeed') },
+    { key: 'seats', label: t('comparison.specs.seats') },
+    { key: 'doors', label: t('comparison.specs.doors') },
+    { key: 'cargo', label: t('comparison.specs.cargo') },
+    { key: 'drivetrain', label: t('comparison.specs.drivetrain') },
+    { key: 'weight', label: t('comparison.specs.weight') },
+    { key: 'length', label: t('comparison.specs.length') },
+    { key: 'width', label: t('comparison.specs.width') },
+    { key: 'height', label: t('comparison.specs.height') }
   ];
 
   const ratingSpecs = [
-    { key: 'safety', label: 'Seguridad' },
-    { key: 'comfort', label: 'Confort' },
-    { key: 'technology', label: 'Tecnología' },
-    { key: 'performance', label: 'Rendimiento' },
-    { key: 'reliability', label: 'Confiabilidad' },
-    { key: 'value', label: 'Valor' }
+    { key: 'safety', label: t('comparison.ratings.safety') },
+    { key: 'comfort', label: t('comparison.ratings.comfort') },
+    { key: 'technology', label: t('comparison.ratings.technology') },
+    { key: 'performance', label: t('comparison.ratings.performance') },
+    { key: 'reliability', label: t('comparison.ratings.reliability') },
+    { key: 'value', label: t('comparison.ratings.value') }
   ];
 
   return (
@@ -124,9 +153,9 @@ const VehicleComparison = () => {
         {/* Header */}
         <div className="comparison-header">
           <div className="header-content">
-            <h1 className="comparison-title">Comparación de Vehículos</h1>
+            <h1 className="comparison-title">{t('comparison.title')}</h1>
             <p className="comparison-subtitle">
-              Compara especificaciones, precios y características de hasta 3 vehículos
+              {t('comparison.subtitle')}
             </p>
           </div>
           <div className="header-actions">
@@ -138,7 +167,7 @@ const VehicleComparison = () => {
               <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
               </svg>
-              Limpiar Todo
+              {t('comparison.clearAll')}
             </button>
           </div>
         </div>
@@ -189,8 +218,8 @@ const VehicleComparison = () => {
                   <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
                   </svg>
-                  <p>Agregar vehículo</p>
-                  <p className="empty-slot-hint">Ve al catálogo para agregar vehículos</p>
+                  <p>{t('comparison.addVehicle')}</p>
+                  <p className="empty-slot-hint">{t('comparison.goToCatalog')}</p>
                 </div>
               </div>
             </div>
@@ -202,10 +231,10 @@ const VehicleComparison = () => {
           <div className="comparison-content">
             {/* Specifications Table */}
             <div className="comparison-section">
-              <h2 className="section-title">Especificaciones Técnicas</h2>
+              <h2 className="section-title">{t('comparison.technicalSpecs')}</h2>
               <div className="comparison-table">
                 <div className="table-header">
-                  <div className="spec-label-column">Especificación</div>
+                  <div className="spec-label-column">{t('comparison.specification')}</div>
                   {activeVehicles.map((vehicle, index) => (
                     <div key={index} className="vehicle-column-header">
                       {vehicle.year} {vehicle.brand} {vehicle.model}
@@ -219,7 +248,7 @@ const VehicleComparison = () => {
                       <div className="spec-label">{spec.label}</div>
                       {activeVehicles.map((vehicle, index) => (
                         <div key={index} className="spec-value">
-                          {vehicle.specifications?.[spec.key] || 'No disponible'}
+                          {vehicle.specifications?.[spec.key] ? translateSpecValue(vehicle.specifications[spec.key], spec.key, t) : t('comparison.notAvailable')}
                         </div>
                       ))}
                     </div>
@@ -230,7 +259,7 @@ const VehicleComparison = () => {
 
             {/* Expert Ratings */}
             <div className="comparison-section">
-              <h2 className="section-title">Calificaciones de Expertos</h2>
+              <h2 className="section-title">{t('comparison.expertRatings')}</h2>
               <div className="ratings-comparison">
                 {ratingSpecs.map(rating => (
                   <div key={rating.key} className="rating-row">
@@ -257,7 +286,7 @@ const VehicleComparison = () => {
 
             {/* Features Comparison */}
             <div className="comparison-section">
-              <h2 className="section-title">Características</h2>
+              <h2 className="section-title">{t('comparison.features')}</h2>
               <div className="features-comparison">
                 <div className="features-grid">
                   {activeVehicles.map((vehicle, index) => (
@@ -269,7 +298,7 @@ const VehicleComparison = () => {
                         {(vehicle.features || []).map((feature, featureIndex) => (
                           <li key={featureIndex} className="feature-item">
                             <span className="feature-icon">✓</span>
-                            {feature}
+                            {t(`vehicleFeatures.${feature}`)}
                           </li>
                         ))}
                       </ul>
@@ -281,7 +310,7 @@ const VehicleComparison = () => {
 
             {/* Price Comparison */}
             <div className="comparison-section">
-              <h2 className="section-title">Comparación de Precios</h2>
+              <h2 className="section-title">{t('comparison.priceComparison')}</h2>
               <div className="price-comparison">
                 <div className="price-chart">
                   {activeVehicles.map((vehicle, index) => (
@@ -313,7 +342,7 @@ const VehicleComparison = () => {
         {/* Available Vehicles Section */}
         {!loading && (
           <div className="available-vehicles-section">
-            <h2 className="section-title">Vehículos Disponibles para Comparar</h2>
+            <h2 className="section-title">{t('comparison.availableVehicles')}</h2>
             <div className="vehicles-grid">
               {allVehicles.map(vehicle => {
                 // Generar análisis para calcular puntuación general
@@ -332,7 +361,7 @@ const VehicleComparison = () => {
                     <div className="vehicle-info">
                       <h4 className="vehicle-name">{vehicle.year} {vehicle.brand} {vehicle.model}</h4>
                       <div className="vehicle-score">
-                        <span className="score-label">Puntuación General:</span>
+                        <span className="score-label">{t('comparison.overallScore')}</span>
                         <div className="overall-score">
                           {overallScore.toFixed(1)}
                         </div>
@@ -348,7 +377,7 @@ const VehicleComparison = () => {
                         }}
                         disabled={!isInComparison(vehicle.id) && !canAddMore}
                       >
-                        {isInComparison(vehicle.id) ? 'En Comparación' : 'Agregar a Comparación'}
+                        {isInComparison(vehicle.id) ? t('comparison.inComparison') : t('comparison.addToComparison')}
                       </button>
                     </div>
                   </div>
@@ -365,8 +394,8 @@ const VehicleComparison = () => {
               <svg width="80" height="80" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M9 3H7c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h2c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 14H7V5h2v12zm8-14h-2c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h2c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 14h-2V5h2v12z"/>
               </svg>
-              <h3>No hay vehículos para comparar</h3>
-              <p>Selecciona vehículos de la lista de abajo para comenzar la comparación</p>
+              <h3>{t('comparison.noVehicles')}</h3>
+              <p>{t('comparison.selectToStart')}</p>
             </div>
           </div>
         )}
@@ -376,7 +405,7 @@ const VehicleComparison = () => {
           <div className="loading-state">
             <div className="loading-spinner">
               <div className="spinner"></div>
-              <p>Cargando vehículos...</p>
+              <p>{t('common.loadingVehicles')}</p>
             </div>
           </div>
         )}

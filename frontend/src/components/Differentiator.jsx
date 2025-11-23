@@ -1,24 +1,27 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import './Differentiator.css';
 
 const Differentiator = () => {
+  const { t } = useTranslation();
+  
   const steps = [
     {
       number: '01',
-      title: 'BÚSQUEDA GUIADA',
-      description: 'No solo listamos autos, guiamos tu búsqueda con datos estructurados y sugerencias personalizadas.',
+      title: t('differentiator.step1Title'),
+      description: t('differentiator.step1Desc'),
       icon: '🔍'
     },
     {
       number: '02',
-      title: 'COMPARACIÓN A FONDO',
-      description: 'Compara especificaciones clave, ideal para usuarios que quieren tomar decisiones informadas.',
+      title: t('differentiator.step2Title'),
+      description: t('differentiator.step2Desc'),
       icon: '⚖️'
     },
     {
       number: '03',
-      title: 'DASHBOARD VISUAL',
-      description: 'Accede a un resumen de precios, características y valoraciones para cada vehículo.',
+      title: t('differentiator.step3Title'),
+      description: t('differentiator.step3Desc'),
       icon: '📊'
     }
   ];
@@ -28,11 +31,11 @@ const Differentiator = () => {
       <div className="differentiator-container">
         <div className="differentiator-header">
           <div className="differentiator-badge">
-            <span>DIFERENCIADOR FRENTE A COMPETIDORES</span>
+            <span>{t('differentiator.badge')}</span>
           </div>
-          <h2 className="differentiator-title text-glow">Cómo Funciona</h2>
+          <h2 className="differentiator-title text-glow">{t('differentiator.title')}</h2>
           <p className="differentiator-subtitle">
-            Nuestra plataforma revoluciona la forma de encontrar tu vehículo ideal con tecnología avanzada y datos precisos.
+            {t('differentiator.subtitle')}
           </p>
         </div>
 

@@ -58,6 +58,7 @@
   gap: 24px;
   flex-wrap: nowrap;
   overflow: visible;
+  margin-left: 200px; /* Espacio para el logo */
 }
 
 .nav-link {
