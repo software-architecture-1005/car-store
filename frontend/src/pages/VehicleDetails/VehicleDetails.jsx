@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import './VehicleDetails.css';
-import { getVehicle } from '../services/vehicleService';
-import { addVehicleToCart } from '../services/cartService';
-import { translateColor, translateSpec, translateFeature, translateTag } from '../i18n/translateVehicleData';
+import { getVehicle } from '../../services/vehicleService';
+import { addVehicleToCart } from '../../services/cartService';
+import { translateColor, translateSpec, translateFeature, translateTag } from '../../i18n/translateVehicleData';
 
 const VehicleDetails = ({ vehicleId, onBack }) => {
   const { t } = useTranslation();

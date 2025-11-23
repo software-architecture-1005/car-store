@@ -3,7 +3,7 @@ import Header from './components/Header';
 import Hero from './components/Hero';
 import Differentiator from './components/Differentiator';
 import SearchResults from './pages/SearchResults';
-import VehicleDetails from './pages/VehicleDetails';
+import VehicleDetails from './pages/VehicleDetails/VehicleDetails';
 import VehicleComparison from './pages/VehicleComparison';
 import Features from './pages/Features';
 import Signup from './pages/Signup';
