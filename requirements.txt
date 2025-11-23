@@ -19,7 +19,7 @@ faker==25.9.1
 
 # Entregable #2 - Nuevas dependencias
 # Generación de reportes PDF
-reportlab==4.0.7
+reportlab==4.4.5
 
 # Generación de reportes Excel
 openpyxl==3.1.2

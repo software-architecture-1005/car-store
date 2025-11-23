@@ -21,6 +21,9 @@ from rest_framework import status
 from rest_framework.views import APIView
 from django.contrib.auth import get_user_model
 from rest_framework.permissions import AllowAny
+from django.http import HttpResponse
+from .services.report_service import VehicleReportService
+from .services.report_generators.pdf_generator import PdfReportGenerator
 
 User = get_user_model()
 
@@ -181,6 +184,44 @@ class VehicleViewSet(viewsets.ModelViewSet):
             }
         
         return Response(suggestions)
+    
+    # Acción para debug - verificar datos
+    @action(detail=False, methods=['get'])
+    def debug(self, request):
+        """Endpoint para debug - verificar qué datos tenemos"""
+        debug_info = {
+            'total_vehicles': Vehicle.objects.count(),
+            'total_makes': Make.objects.count(),
+            'total_categories': Category.objects.count(),
+            'makes': list(Make.objects.values('id', 'name')),
+            'categories': list(Category.objects.values('id', 'name')),
+            'vehicles_sample': list(Vehicle.objects.select_related('make', 'category').values(
+                'id', 'model', 'make__name', 'category__name', 'year', 'price'
+            )[:5])
+        }
+        return Response(debug_info)
+    
+    # Acción para descargar reporte PDF del vehículo
+    @action(detail=True, methods=['get'])
+    def download_report(self, request, pk=None):
+        """
+        Genera y descarga un reporte PDF del vehículo.
+        Demuestra el Principio de Inversión de Dependencias (DIP).
+        """
+        vehicle = self.get_object()
+        
+        # Inyección de Dependencias (Manual)
+        # El servicio (Alto Nivel) recibe la implementación concreta (Bajo Nivel)
+        # pero depende solo de la abstracción (Interfaz).
+        generator = PdfReportGenerator()
+        service = VehicleReportService(generator)
+        
+        pdf_content = service.generate_vehicle_report(vehicle)
+        
+        response = HttpResponse(pdf_content, content_type='application/pdf')
+        filename = f"reporte_{vehicle.make.name}_{vehicle.model}.pdf".replace(" ", "_")
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
+        return response
     
 class ReviewViewSet(viewsets.ModelViewSet):
     queryset = Review.objects.all()

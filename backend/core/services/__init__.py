@@ -1,5 +1,5 @@
-# Services package
-# Import VehicleSearch from the parent services.py module
+from .vehicle_search import VehicleSearch
+from .report_service import VehicleReportService
 import importlib.util
 import os
 

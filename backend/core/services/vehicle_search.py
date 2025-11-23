@@ -1,5 +1,5 @@
 from django.db.models import Q
-from .models import Vehicle, Make, Category
+from ..models import Vehicle, Make, Category
 
 class VehicleSearch:
     def __init__(self, filters=None):
@@ -149,4 +149,3 @@ class VehicleSearch:
         else:
             # Sin búsqueda, ordenar por año descendente y marca
             self.queryset = self.queryset.order_by('-year', 'make__name')
-        
