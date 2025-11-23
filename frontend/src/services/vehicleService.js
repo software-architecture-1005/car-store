@@ -1,7 +1,25 @@
 import api from '../api/axiosGlobalInstance';
 
 export const getVehicles = (params = {}) =>
-    api.get('/vehicles/', { params }).then((res) => res.data.results);
+    api.get('/vehicles/', { params }).then((res) => {
+        console.log('getVehicles - Respuesta completa:', res);
+        console.log('getVehicles - res.data:', res.data);
+        // Manejar tanto respuestas paginadas como no paginadas
+        if (res.data.results) {
+            console.log('getVehicles - Respuesta paginada, results:', res.data.results);
+            return res.data.results;
+        }
+        if (Array.isArray(res.data)) {
+            console.log('getVehicles - Respuesta directa (array):', res.data);
+            return res.data;
+        }
+        console.warn('getVehicles - Formato inesperado, devolviendo array vacío');
+        return [];
+    }).catch((error) => {
+        console.error('getVehicles - Error:', error);
+        console.error('getVehicles - Error response:', error.response);
+        throw error;
+    });
 
 export const getVehicle = (id) =>
     api.get(`/vehicles/${id}/`).then((res) => res.data);
@@ -41,7 +59,13 @@ export const searchVehicles = (searchParams = {}) => {
     
     console.log('URL params:', params.toString());
     console.log('Search params sent to backend:', searchParams);
-    return api.get(`/vehicles/search/?${params.toString()}`).then((res) => res.data);
+    return api.get(`/vehicles/search/?${params.toString()}`).then((res) => {
+        // Manejar tanto respuestas paginadas como no paginadas
+        if (res.data.results) {
+            return res.data.results;
+        }
+        return Array.isArray(res.data) ? res.data : [];
+    });
 };
 
 export const getSearchSuggestions = (query) =>

@@ -13,6 +13,7 @@ import Admin from './pages/Admin/Admin';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { ComparisonProvider } from './contexts/ComparisonContext';
 import { ServicesProvider } from './contexts/ServicesContext';
+import { CurrencyProvider } from './contexts/CurrencyContext';
 import './App.css';
 
 function AppContent() {
@@ -86,9 +87,11 @@ function App() {
   return (
     <ServicesProvider>
       <AuthProvider>
-        <ComparisonProvider>
-          <AppContent />
-        </ComparisonProvider>
+        <CurrencyProvider>
+          <ComparisonProvider>
+            <AppContent />
+          </ComparisonProvider>
+        </CurrencyProvider>
       </AuthProvider>
     </ServicesProvider>
   );

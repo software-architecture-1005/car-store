@@ -108,6 +108,7 @@
   },
   "vehicle": {
     "make": "Marca",
+    "brand": "Marca",
     "model": "Modelo",
     "year": "Año",
     "price": "Precio",
@@ -131,6 +132,7 @@
     "compare": "Comparar",
     "promoted": "Destacado",
     "noMake": "Sin marca",
+    "noBrand": "Sin marca",
     "noCategory": "Sin categoría"
   },
   "cart": {
@@ -141,7 +143,10 @@
     "remove": "Eliminar",
     "continueShopping": "Continuar comprando",
     "itemAdded": "Artículo agregado al carrito",
-    "itemRemoved": "Artículo eliminado del carrito"
+    "itemRemoved": "Artículo eliminado del carrito",
+    "itemsCount": "{{count}} artículo(s) en el carrito",
+    "itemsCount_one": "1 artículo en el carrito",
+    "itemsCount_other": "{{count}} artículos en el carrito"
   },
   "auth": {
     "login": "Iniciar Sesión",
@@ -179,9 +184,25 @@
     "vehicles": "Gestión de Vehículos",
     "users": "Gestión de Usuarios",
     "addVehicle": "Agregar Vehículo",
+    "manageVehicles": "Gestionar Vehículos",
+    "addNewVehicle": "Agregar Nuevo Vehículo",
+    "registeredVehicles": "Vehículos Registrados",
     "editVehicle": "Editar Vehículo",
     "deleteVehicle": "Eliminar Vehículo",
-    "confirmDelete": "¿Estás seguro de que deseas eliminar este vehículo?"
+    "confirmDelete": "¿Estás seguro de que deseas eliminar este vehículo?",
+    "registerVehicle": "Registrar Vehículo",
+    "register": "Registrar",
+    "model": "Modelo",
+    "year": "Año",
+    "color": "Color",
+    "price": "Precio",
+    "selectMake": "Seleccionar Marca",
+    "selectBrand": "Seleccionar Marca",
+    "selectCategory": "Seleccionar Categoría",
+    "selectFile": "Agregar Imagen",
+    "allFieldsRequired": "Todos los campos son obligatorios",
+    "loadingVehicles": "Cargando vehículos...",
+    "noVehiclesFound": "No se encontraron vehículos."
   },
   "comparison": {
     "title": "Comparación de Vehículos",
@@ -471,5 +492,16 @@
     "contactForInfo": "Contactar para más información",
     "mainDealer": "Concesionario Principal",
     "country": "Colombia"
+  },
+  "currency": {
+    "title": "Precios en múltiples monedas",
+    "loading": "Cargando tasas de cambio...",
+    "error": "Error al cargar tasas de cambio",
+    "lastUpdate": "Última actualización",
+    "basePrice": "Precio base",
+    "usd": "Dólar estadounidense (USD)",
+    "eur": "Euro (EUR)",
+    "cop": "Peso colombiano (COP)",
+    "selectCurrency": "Moneda"
   }
 }

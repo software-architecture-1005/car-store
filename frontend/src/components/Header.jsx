@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import './Header.css';
 import logoImage from '../assets/Logo-automatch-sin-fondo.png';
 import { useAuth } from '../contexts/AuthContext';
+import CurrencySelector from './CurrencySelector';
 
 const Header = ({ currentPage, onNavigate }) => {
   const { isAuthenticated, user, logout } = useAuth();
@@ -107,22 +108,25 @@ const Header = ({ currentPage, onNavigate }) => {
           )}
         </nav>
 
-        {/* Language Selector */}
-        <div className="language-selector">
-          <button 
-            className={`nav-link ${i18n.language === 'es' ? 'active' : ''}`}
-            onClick={() => changeLanguage('es')}
-            style={{ padding: '5px 10px', fontSize: '0.9em' }}
-          >
-            ES
-          </button>
-          <button 
-            className={`nav-link ${i18n.language === 'en' ? 'active' : ''}`}
-            onClick={() => changeLanguage('en')}
-            style={{ padding: '5px 10px', fontSize: '0.9em' }}
-          >
-            EN
-          </button>
+        {/* Currency and Language Selectors */}
+        <div className="header-controls">
+          <CurrencySelector />
+          <div className="language-selector">
+            <button 
+              className={`nav-link ${i18n.language === 'es' ? 'active' : ''}`}
+              onClick={() => changeLanguage('es')}
+              style={{ padding: '5px 10px', fontSize: '0.9em' }}
+            >
+              ES
+            </button>
+            <button 
+              className={`nav-link ${i18n.language === 'en' ? 'active' : ''}`}
+              onClick={() => changeLanguage('en')}
+              style={{ padding: '5px 10px', fontSize: '0.9em' }}
+            >
+              EN
+            </button>
+          </div>
         </div>
 
       </div>

@@ -1,9 +1,14 @@
 // src/components/VehicleList.jsx
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useCurrency } from '../contexts/CurrencyContext';
+import { translateColor } from '../i18n/translateVehicleData';
 import { getVehicles } from '../services/vehicleService';
 import './VehicleList.css';
 
 export default function VehicleList() {
+  const { t } = useTranslation();
+  const { formatPrice } = useCurrency();
   const [vehicles, setVehicles] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -14,11 +19,11 @@ export default function VehicleList() {
   }, []);
 
   if (loading) {
-    return <p>Cargando vehículos...</p>;
+    return <p>{t('admin.loadingVehicles')}</p>;
   }
 
   if (vehicles.length === 0) {
-    return <p>No se encontraron vehículos.</p>;
+    return <p>{t('admin.noVehiclesFound')}</p>;
   }
 
   return (
@@ -32,9 +37,9 @@ export default function VehicleList() {
           />
           <div className="vehicle-info">
             <h3>{vehicle.model}</h3>
-            <p>Año: {vehicle.year}</p>
-            <p>Color: {vehicle.color}</p>
-            <p>Precio: ${vehicle.price}</p>
+            <p>{t('admin.year')}: {vehicle.year}</p>
+            <p>{t('admin.color')}: {translateColor(vehicle.color, t)}</p>
+            <p>{t('admin.price')}: {formatPrice(vehicle.price)}</p>
           </div>
         </div>
       ))}

@@ -26,6 +26,7 @@ openpyxl==3.1.2
 
 # Consumo de APIs externas
 requests==2.31.0
+coreapi==2.3.3
 
 # Internacionalización (ya incluido en Django, pero agregamos django-rosetta para gestión)
 django-rosetta==0.10.0

@@ -2,11 +2,13 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import './VehicleCard.css';
 import { useComparison } from '../contexts/ComparisonContext';
+import { useCurrency } from '../contexts/CurrencyContext';
 import { addVehicleToCart } from '../services/cartService';
 import { translateColor, translateSpec } from '../i18n/translateVehicleData';
 
 const VehicleCard = ({ vehicle, onViewDetails, onCompare }) => {
   const { t } = useTranslation();
+  const { formatPrice } = useCurrency();
   const {
     id,
     image,
@@ -59,14 +61,6 @@ const VehicleCard = ({ vehicle, onViewDetails, onCompare }) => {
     }
   };
 
-  const formatPrice = (price) => {
-    return new Intl.NumberFormat('es-CO', {
-      style: 'currency',
-      currency: 'COP',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0
-    }).format(price);
-  };
 
   const renderStars = (rating) => {
     const stars = [];
