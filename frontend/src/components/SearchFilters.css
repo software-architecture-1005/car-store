@@ -1,21 +1,3 @@
-.search-filters {
-  background: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  padding: 20px;
-  position: sticky;
-  top: 100px;
-  max-height: calc(100vh - 120px);
-  overflow-y: auto;
-  overflow-x: hidden;
-  transition: all 0.3s ease;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.search-filters.collapsed .filters-content {
-  display: none;
-}
 
 .filters-header {
   display: flex;
