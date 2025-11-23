@@ -253,6 +253,20 @@ curl -X POST http://localhost:8000/car-store/api/v1/makes/ \
 
 # Advanced search
 curl "http://localhost:8000/car-store/api/v1/vehicles/search/?text=toyota&year_min=2020"
+```
+
+#### With Browser
+```
+http://localhost:8000/car-store/api/v1/makes/
+http://localhost:8000/car-store/api/v1/vehicles/
+```
+
+## 🚨 Troubleshooting
+
+### Error: "ModuleNotFoundError: No module named 'drf_spectacular'"
+**Cause**: Dependencies not installed  
+**Solution**: 
+```bash
 pip install -r requirements.txt
 ```
 
