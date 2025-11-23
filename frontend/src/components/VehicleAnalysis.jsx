@@ -143,7 +143,7 @@ const VehicleAnalysis = ({ vehicles, selectedVehicle, onSelectVehicle }) => {
         {/* Vehicle Selection */}
         <div className="vehicle-selection">
           <h3 className="selection-title">{t('analysis.selectVehicle')}</h3>
-          <div className="vehicles-grid">
+          <div className="analysis-vehicles-grid">
             {vehicles.map((vehicle) => {
               const analysis = generateAnalysis(vehicle);
               const overallScore = Object.values(analysis).reduce((acc, category) => acc + category.score, 0) / Object.keys(analysis).length;
@@ -151,19 +151,17 @@ const VehicleAnalysis = ({ vehicles, selectedVehicle, onSelectVehicle }) => {
               return (
                 <div 
                   key={vehicle.id}
-                  className={`vehicle-option ${selectedVehicle?.id === vehicle.id ? 'selected' : ''}`}
+                  className={`analysis-vehicle-card-compact ${selectedVehicle?.id === vehicle.id ? 'selected' : ''}`}
                   onClick={() => handleVehicleSelect(vehicle)}
                 >
-                  <div className="vehicle-image">
+                  <div className="compact-image-wrapper">
                     <img src={vehicle.image} alt={`${vehicle.brand} ${vehicle.model}`} />
                   </div>
-                  <div className="vehicle-info">
-                    <h4 className="vehicle-name">{vehicle.year} {vehicle.brand} {vehicle.model}</h4>
-                    <div className="vehicle-score">
-                      <span className="score-label">{t('analysis.overallScore')}</span>
-                      <div className="overall-score">
-                        {overallScore.toFixed(1)}
-                      </div>
+                  <div className="compact-info-wrapper">
+                    <h4 className="compact-vehicle-name">{vehicle.year} {vehicle.brand} {vehicle.model}</h4>
+                    <span className="compact-score-label">{t('analysis.overallScore')}</span>
+                    <div className="compact-overall-score">
+                      {overallScore.toFixed(1)}
                     </div>
                   </div>
                 </div>
@@ -184,14 +182,8 @@ const VehicleAnalysis = ({ vehicles, selectedVehicle, onSelectVehicle }) => {
               <div className="selected-vehicle-header">
                 <div className="selected-vehicle-info">
                   <img src={selectedVehicle.image} alt={`${selectedVehicle.brand} ${selectedVehicle.model}`} />
-                  <div className="vehicle-details">
+                  <div className="analysis-header-info">
                     <h3>{selectedVehicle.year} {selectedVehicle.brand} {selectedVehicle.model}</h3>
-                    <div className="overall-rating">
-                      <span className="rating-label">{t('analysis.overallScore')}</span>
-                      <div className="rating-score">
-                        {overallScore.toFixed(1)}
-                      </div>
-                    </div>
                   </div>
                 </div>
               </div>

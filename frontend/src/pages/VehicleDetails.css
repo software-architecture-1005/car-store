@@ -455,7 +455,7 @@
 }
 
 .tab-content {
-  min-height: 400px;
+  min-height: auto;
 }
 
 .overview-content,
