@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useCurrency } from '../../contexts/CurrencyContext';
 import VehicleAnalysis from '../../components/VehicleAnalysis';
 import { getVehicles } from '../../services/vehicleService';
 import './Features.css';
 
 const Features = () => {
   const { t } = useTranslation();
-  const { formatPrice } = useCurrency();
   const [vehicles, setVehicles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedVehicle, setSelectedVehicle] = useState(null);
@@ -43,11 +41,9 @@ const Features = () => {
           ]
         }));
         setVehicles(transformedVehicles);
-        if (transformedVehicles.length > 0) {
-          setSelectedVehicle(transformedVehicles[0]);
-        }
+        if (transformedVehicles.length > 0) setSelectedVehicle(transformedVehicles[0]);
       } catch (error) {
-        console.error('Error cargando vehículos:', error);
+        // Mantener manejo de error silencioso
       } finally {
         setLoading(false);
       }
@@ -73,6 +69,7 @@ const Features = () => {
   return (
     <div className="features-page">
       <div className="features-container">
+        {/* Debug panel removed */}
         {/* Header Section */}
         <div className="features-header">
           <div className="features-badge">

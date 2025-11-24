@@ -1,11 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import './VehicleAnalysis.css';
 import { useComparison } from '../contexts/ComparisonContext';
+import { downloadVehicleReport } from '../services/vehicleService';
 
 const VehicleAnalysis = ({ vehicles, selectedVehicle, onSelectVehicle }) => {
   const { t } = useTranslation();
   const { addToComparison, isInComparison, canAddMore } = useComparison();
+  const [downloading, setDownloading] = useState(false);
+  // Debug hooks removed
 
   // Generar análisis basado en datos reales del backend
   const generateAnalysis = (vehicle) => {
@@ -108,6 +111,36 @@ const VehicleAnalysis = ({ vehicles, selectedVehicle, onSelectVehicle }) => {
     }
   };
 
+  const handleDownloadReport = async () => {
+    if (!selectedVehicle) return;
+    setDownloading(true);
+    try {
+      const id = selectedVehicle.id;
+      if (id === undefined || id === null) {
+        alert('El vehículo seleccionado no tiene ID válido.');
+        return;
+      }
+      const blob = await downloadVehicleReport(id);
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      const filename = `reporte_${selectedVehicle.brand}_${selectedVehicle.model}`.replace(/\s+/g, '_') + '.pdf';
+      link.setAttribute('download', filename);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      if (error.response && error.response.status === 401) {
+        alert(t('common.loginRequired') || 'Debes iniciar sesión para descargar el reporte.');
+      } else {
+        alert(t('common.errorDownloadingReport') || 'Error descargando el reporte');
+      }
+    } finally {
+      setDownloading(false);
+    }
+  };
+
   const renderScoreBar = (score, maxScore = 10) => {
     const percentage = (score / maxScore) * 100;
     return (
@@ -132,6 +165,7 @@ const VehicleAnalysis = ({ vehicles, selectedVehicle, onSelectVehicle }) => {
   return (
     <div className="vehicle-analysis">
       <div className="analysis-container">
+        {/* Debug panel removed */}
         {/* Header */}
         <div className="analysis-header">
           <h2 className="analysis-title">{t('analysis.title')}</h2>
@@ -258,11 +292,16 @@ const VehicleAnalysis = ({ vehicles, selectedVehicle, onSelectVehicle }) => {
                   </svg>
                   {isInComparison(selectedVehicle.id) ? t('analysis.inComparison') : t('analysis.compareVehicle')}
                 </button>
-                <button className="btn-secondary">
+                <button 
+                  className={`btn-secondary ${downloading ? 'disabled' : ''}`} 
+                  onClick={handleDownloadReport}
+                  disabled={downloading}
+                  aria-label="download-report"
+                >
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                   </svg>
-                  {t('analysis.saveAnalysis')}
+                  {downloading ? (t('common.downloading') || 'Descargando...') : t('analysis.saveAnalysis')}
                 </button>
               </div>
             </div>
