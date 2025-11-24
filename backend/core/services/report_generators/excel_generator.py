@@ -90,3 +90,4 @@ class ExcelReportGenerator(IVehicleReportGenerator):
         buffer.seek(0)
         return buffer.getvalue()
 
+
