@@ -40,6 +40,9 @@ services:
     restart: unless-stopped
     ports:
       - "80:80"
+    volumes:
+      # Montar el directorio media del backend para que nginx pueda servirlo directamente
+      - ./backend/media:/media:ro
     depends_on:
       - backend
     networks:
