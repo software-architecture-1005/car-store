@@ -12,7 +12,8 @@ services:
     volumes:
       - ./backend:/app
       - backend_static:/app/static
-      - backend_media:/app/media
+      # Usar bind mount para media para que las imágenes sean accesibles
+      - ./backend/media:/app/media
     environment:
       - DEBUG=${DEBUG:-False}
       - SECRET_KEY=${SECRET_KEY:-django-insecure-change-in-production}
