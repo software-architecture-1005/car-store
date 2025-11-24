@@ -50,7 +50,13 @@ class VehicleSerializer(serializers.ModelSerializer):
                     url = obj.image.url
                 except Exception:
                     return None
-                return request.build_absolute_uri(url) if request else url
+                if request:
+                    # Usar el host del request, pero asegurar que use el protocolo correcto
+                    return request.build_absolute_uri(url)
+                # Fallback: construir URL manualmente si no hay request
+                from django.conf import settings
+                base_url = getattr(settings, 'BASE_URL', 'http://localhost:8000')
+                return f"{base_url}{url}"
             return None
 
 class AvailableVehicleSerializer(serializers.ModelSerializer):

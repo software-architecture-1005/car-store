@@ -180,6 +180,9 @@ CORS_ALLOW_ALL_ORIGINS = True  # Solo para desarrollo
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
+# Base URL para construir URLs absolutas (útil en producción)
+BASE_URL = os.environ.get('BASE_URL', 'http://localhost:8000')
+
 # Configuración de JWT
 from datetime import timedelta
 
