@@ -15,7 +15,9 @@ axiosGlobalInstance.interceptors.request.use((config) => {
     // Unificamos el nombre de la clave del token a 'accessToken'
     const token = localStorage.getItem('accessToken');
     
-    if (token) {
+    // Solo enviar el token si existe y no está vacío
+    // Para endpoints públicos con AllowAny, no es necesario enviar el token
+    if (token && token.trim() !== '') {
         config.headers = config.headers || {};
         config.headers.Authorization = `Bearer ${token}`;
     }

@@ -142,6 +142,6 @@ class ExchangeRateService:
             "converted_amount": round(converted, 2),
             "from_currency": from_currency,
             "to_currency": to_currency,
-            "rate": round(rate, 6),
+            "rate": rate,  # Mantener precisión completa del rate para cálculos precisos
             "last_updated": rates_data.get('last_updated')
         }

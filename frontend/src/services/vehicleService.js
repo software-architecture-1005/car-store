@@ -76,3 +76,15 @@ export const getVehiclesByMake = (makeId) =>
 
 export const getVehiclesByCategory = (categoryId) =>
     api.get(`/vehicles/by_category/?category_id=${categoryId}`).then((res) => res.data);
+
+/**
+ * Descarga un reporte PDF del vehículo
+ * @param {number} vehicleId - ID del vehículo
+ * @returns {Promise<Blob>} Blob del archivo PDF
+ */
+export const downloadVehicleReport = async (vehicleId) => {
+    const response = await api.get(`/vehicles/${vehicleId}/download_report/`, {
+        responseType: 'blob' // Importante: indicar que esperamos un blob (archivo binario)
+    });
+    return response.data; // Retorna el blob directamente
+};

@@ -5,6 +5,7 @@ from rest_framework import viewsets
 from .services import VehicleSearch
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.permissions import AllowAny
+from rest_framework.authentication import SessionAuthentication
 from rest_framework import status
 # Importar funciones de traducción para i18n
 from django.utils.translation import gettext as _
@@ -23,7 +24,6 @@ from django.contrib.auth import get_user_model
 from rest_framework.permissions import AllowAny
 from django.http import HttpResponse
 from .services.report_service import VehicleReportService
-from .services.report_generators.pdf_generator import PdfReportGenerator
 
 User = get_user_model()
 
@@ -40,10 +40,14 @@ class SignupView(APIView):
 class MakeViewSet(viewsets.ModelViewSet):
     queryset = Make.objects.all()
     serializer_class = MakeSerializer
+    permission_classes = [AllowAny]  # Público para listar marcas
+    authentication_classes = []  # No requiere autenticación
 
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+    permission_classes = [AllowAny]  # Público para listar categorías
+    authentication_classes = []  # No requiere autenticación
 
 class RoleViewSet(viewsets.ModelViewSet):
     queryset = Role.objects.all()
@@ -64,6 +68,8 @@ class ExpertViewSet(viewsets.ModelViewSet):
 class VehicleViewSet(viewsets.ModelViewSet):
     queryset = Vehicle.objects.all()
     serializer_class = VehicleSerializer
+    permission_classes = [AllowAny]  # Público para listar y ver vehículos
+    authentication_classes = []  # No requiere autenticación
     
     def get_serializer_context(self):
         context = super().get_serializer_context()
@@ -201,25 +207,43 @@ class VehicleViewSet(viewsets.ModelViewSet):
         }
         return Response(debug_info)
     
-    # Acción para descargar reporte PDF del vehículo
+    # Acción para descargar reporte del vehículo (PDF o Excel)
     @action(detail=True, methods=['get'])
     def download_report(self, request, pk=None):
         """
-        Genera y descarga un reporte PDF del vehículo.
+        Genera y descarga un reporte del vehículo en formato PDF o Excel.
         Demuestra el Principio de Inversión de Dependencias (DIP).
+        
+        Parámetros de query:
+        - format: 'pdf' (default) o 'excel'
         """
         vehicle = self.get_object()
+        
+        # Obtener formato solicitado (default: PDF)
+        report_format = request.query_params.get('format', 'pdf').lower()
         
         # Inyección de Dependencias (Manual)
         # El servicio (Alto Nivel) recibe la implementación concreta (Bajo Nivel)
         # pero depende solo de la abstracción (Interfaz).
-        generator = PdfReportGenerator()
+        # Esto demuestra el Principio de Inversión de Dependencias (DIP):
+        # - Alto nivel (VehicleReportService) depende de la abstracción (IVehicleReportGenerator)
+        # - Bajo nivel (PdfReportGenerator, ExcelReportGenerator) implementa la abstracción
+        if report_format == 'excel':
+            from .services.report_generators.excel_generator import ExcelReportGenerator
+            generator = ExcelReportGenerator()
+            content_type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            extension = 'xlsx'
+        else:
+            from .services.report_generators.pdf_generator import PdfReportGenerator
+            generator = PdfReportGenerator()
+            content_type = 'application/pdf'
+            extension = 'pdf'
+        
         service = VehicleReportService(generator)
+        report_content = service.generate_vehicle_report(vehicle)
         
-        pdf_content = service.generate_vehicle_report(vehicle)
-        
-        response = HttpResponse(pdf_content, content_type='application/pdf')
-        filename = f"reporte_{vehicle.make.name}_{vehicle.model}.pdf".replace(" ", "_")
+        response = HttpResponse(report_content, content_type=content_type)
+        filename = f"reporte_{vehicle.make.name}_{vehicle.model}.{extension}".replace(" ", "_")
         response['Content-Disposition'] = f'attachment; filename="{filename}"'
         return response
     
@@ -479,6 +503,7 @@ class ExchangeRateViewSet(viewsets.ViewSet):
     - POST /api/v1/exchange-rates/convert/ - Convertir precio entre monedas
     """
     permission_classes = [AllowAny]
+    authentication_classes = []  # No requiere autenticación
 
     def list(self, request):
         """

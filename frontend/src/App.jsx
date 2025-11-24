@@ -10,6 +10,7 @@ import Signup from './pages/AuthPages/Signup/Signup';
 import Login from './pages/AuthPages/Login/Login';
 import CartPage from './pages/CartPage/CartPage';
 import Admin from './pages/Admin/Admin';
+import ErrorBoundary from './components/ErrorBoundary';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { ComparisonProvider } from './contexts/ComparisonContext';
 import { ServicesProvider } from './contexts/ServicesContext';
@@ -85,15 +86,17 @@ function AppContent() {
 
 function App() {
   return (
-    <ServicesProvider>
-      <AuthProvider>
-        <CurrencyProvider>
-          <ComparisonProvider>
-            <AppContent />
-          </ComparisonProvider>
-        </CurrencyProvider>
-      </AuthProvider>
-    </ServicesProvider>
+    <ErrorBoundary>
+      <ServicesProvider>
+        <AuthProvider>
+          <CurrencyProvider>
+            <ComparisonProvider>
+              <AppContent />
+            </ComparisonProvider>
+          </CurrencyProvider>
+        </AuthProvider>
+      </ServicesProvider>
+    </ErrorBoundary>
   );
 }
 

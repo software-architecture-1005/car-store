@@ -13,7 +13,7 @@ export const useCurrency = () => {
 
 export const CurrencyProvider = ({ children }) => {
   const [selectedCurrency, setSelectedCurrency] = useState('COP');
-  const [conversionRate, setConversionRate] = useState(null);
+  const [conversionRate, setConversionRate] = useState(1); // Inicializar en 1 para COP
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -31,6 +31,7 @@ export const CurrencyProvider = ({ children }) => {
       if (selectedCurrency === 'COP') {
         setConversionRate(1);
         setError(null);
+        setLoading(false);
         return;
       }
 
@@ -38,21 +39,35 @@ export const CurrencyProvider = ({ children }) => {
         setLoading(true);
         setError(null);
         // Obtener tasa de conversión de COP a la moneda seleccionada
+        // Usamos 1 COP para obtener el rate directamente
         const result = await convertPriceAPI(1, 'COP', selectedCurrency);
-        if (result.error) {
-          throw new Error(result.error);
+        
+        // Verificar si hay error en la respuesta
+        if (result && result.error) {
+          throw new Error(result.error + (result.details ? `: ${result.details}` : ''));
         }
-        setConversionRate(result.rate);
+        
+        // El backend devuelve rate correctamente calculado
+        if (result && typeof result.rate === 'number' && result.rate > 0) {
+          setConversionRate(result.rate);
+        } else {
+          console.warn('Rate inválido recibido:', result);
+          setError('Tasa de conversión inválida');
+          setConversionRate(1); // Fallback a tasa 1
+        }
       } catch (err) {
         console.error('Error fetching conversion rate:', err);
-        setError(err.message);
+        setError(err.message || 'Error al obtener tasa de conversión');
         setConversionRate(1); // Fallback a tasa 1 si hay error
       } finally {
         setLoading(false);
       }
     };
 
-    fetchConversionRate();
+    // Solo intentar fetch si no estamos en COP
+    if (selectedCurrency !== 'COP') {
+      fetchConversionRate();
+    }
   }, [selectedCurrency]);
 
   const changeCurrency = (currency) => {
@@ -65,8 +80,11 @@ export const CurrencyProvider = ({ children }) => {
   const convertPriceAmount = (priceInCOP) => {
     if (!priceInCOP || priceInCOP <= 0) return 0;
     if (selectedCurrency === 'COP') return priceInCOP;
-    if (!conversionRate) return priceInCOP;
-    return priceInCOP * conversionRate;
+    // Usar rate si está disponible, sino retornar precio original
+    if (conversionRate && conversionRate > 0) {
+      return priceInCOP * conversionRate;
+    }
+    return priceInCOP;
   };
 
   const formatPrice = (priceInCOP) => {

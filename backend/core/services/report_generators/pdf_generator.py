@@ -49,7 +49,7 @@ class PdfReportGenerator(IVehicleReportGenerator):
             ["Precio", f"${vehicle.price:,.2f}"],
             ["Color", vehicle.color],
             ["Categoría", vehicle.category.name if vehicle.category else "N/A"],
-            ["Descripción", vehicle.description or "Sin descripción"]
+            ["Disponible", "Sí" if vehicle.is_available else "No"]
         ]
 
         # Estilo de la tabla

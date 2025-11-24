@@ -31,18 +31,40 @@ export const convertPrice = (amount, fromCurrency, toCurrency) =>
     from_currency: fromCurrency,
     to_currency: toCurrency
   })
-    .then((res) => res.data)
-    .catch((error) => {
-      console.error('Error converting price:', error);
-      // Si es un error de red, retornar un objeto de error estructurado
-      if (!error.response) {
+    .then((res) => {
+      // El backend ya devuelve rate correctamente calculado
+      // Usar directamente los valores del backend
+      if (res.data && res.data.rate !== undefined) {
         return {
-          error: 'Network error',
-          details: 'Could not connect to the server. Please check if the backend is running.',
-          converted_amount: null
+          rate: res.data.rate,
+          converted_amount: res.data.converted_amount,
+          original_amount: res.data.original_amount,
+          from_currency: res.data.from_currency,
+          to_currency: res.data.to_currency
         };
       }
-      throw error;
+      return res.data;
+    })
+    .catch((error) => {
+      console.error('Error converting price:', error);
+      // Si es un error de red o 401, retornar un objeto de error estructurado
+      if (!error.response || error.response.status === 401) {
+        return {
+          error: error.response?.status === 401 
+            ? 'Unauthorized: Please check backend permissions' 
+            : 'Network error',
+          details: 'Could not connect to the server. Please check if the backend is running.',
+          converted_amount: null,
+          rate: 1 // Fallback rate
+        };
+      }
+      // Para otros errores, retornar objeto de error en lugar de lanzar
+      return {
+        error: error.response?.data?.error || 'Conversion failed',
+        details: error.response?.data?.details || error.message,
+        converted_amount: null,
+        rate: 1 // Fallback rate
+      };
     });
 
 /**
