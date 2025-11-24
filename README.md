@@ -1,22 +1,41 @@
-# 🚗 Car Store
+# 🚗 Car Store - AutoMatch
+
+## 🌐 Live Application
+
+**🔗 [View Live Application](http://52.90.19.84)**
+
+- **Frontend**: http://52.90.19.84
+- **Backend API**: http://52.90.19.84:8000/car-store/api/v1/
+- **API Documentation**: http://52.90.19.84:8000/car-store/api/docs/
 
 ## 📦 Description
 
-Car store project with React frontend and Django REST API backend.
+Car store project (AutoMatch) with React frontend and Django REST API backend. A modern vehicle marketplace application with features including vehicle search, comparison, currency conversion, and internationalization support.
 
 ## 🛠️ Technologies
 
 ### Frontend
-- React 18.x
-- TypeScript
+- React 19.x
 - Vite (build tool)
-- CSS Modules / Styled Components
+- React Router DOM (routing)
+- Axios (HTTP client)
+- React i18next (internationalization)
+- Bootstrap & Tailwind CSS (styling)
+- Nginx (production server)
 
 ### Backend
 - Django 4.2.7
 - Django REST Framework 3.14.0
 - drf-spectacular (API documentation)
+- Django Rosetta (translation management)
 - SQLite (development database)
+- Gunicorn (production server)
+- Docker & Docker Compose (containerization)
+
+### Deployment
+- AWS EC2 (cloud hosting)
+- Docker (containerization)
+- Nginx (reverse proxy & static file serving)
 
 ## 🚀 Installation
 
@@ -288,7 +307,45 @@ python manage.py migrate
 
 ## 🔗 Useful Links
 
+### Production (Live)
+- **🌐 Live Application**: http://52.90.19.84
+- **📚 API Documentation**: http://52.90.19.84:8000/car-store/api/docs/
+- **🔧 Backend API**: http://52.90.19.84:8000/car-store/api/v1/
+
+### Local Development
 - **Swagger UI**: `http://localhost:8000/api/docs/`
 - **ReDoc**: `http://localhost:8000/api/redoc/`
 - **OpenAPI Schema**: `http://localhost:8000/api/schema/`
 - **Django Admin**: `http://localhost:8000/admin/`
+
+## 🚀 Deployment
+
+The application is deployed on AWS EC2 using Docker and Docker Compose. For deployment instructions, see the deployment documentation.
+
+### Quick Start with Docker
+
+```bash
+# Build and start containers
+docker-compose up -d
+
+# Run migrations
+docker-compose exec backend python manage.py migrate
+
+# Collect static files
+docker-compose exec backend python manage.py collectstatic --noinput
+
+# View logs
+docker-compose logs -f
+```
+
+## 📋 Features
+
+- ✅ Vehicle search and filtering
+- ✅ Vehicle comparison
+- ✅ Shopping cart functionality
+- ✅ Multi-currency support (USD, COP, EUR)
+- ✅ Internationalization (English/Spanish)
+- ✅ Responsive design
+- ✅ JWT authentication
+- ✅ API documentation (Swagger/ReDoc)
+- ✅ Report generation (PDF/Excel)

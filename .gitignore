@@ -20,3 +20,19 @@ build/
 .idea/
 npm-debug.log
 .kiro
+
+# Archivos de despliegue y configuración sensible
+*.pem
+*.key
+car-store-key.pem
+deploy-temp.sh
+update-env.sh
+auto-deploy.ps1
+DEPLOY_INSTRUCTIONS.md
+QUICK_DEPLOY.md
+
+# Archivos temporales y de prueba
+*.tmp
+*.swp
+*.bak
+check_urls.py
